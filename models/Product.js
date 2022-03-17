@@ -44,6 +44,10 @@ const Product = new Schema({
             ref:"Image"
         }
     ],
+    brand:{
+        type:String,
+        require:[true]
+    }
 },
 {
     timestamps:true,
