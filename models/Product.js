@@ -46,7 +46,7 @@ const Product = new Schema({
     ],
     brand:{
         type:String,
-        require:[true]
+        required: [true]
     }
 },
 {
