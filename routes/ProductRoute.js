@@ -7,4 +7,13 @@ module.exports = (app) => {
     .post(ProductService.createProduct)  
     app.route('/getAll')
     .get(ProductService.getAllProduct)  
+    app.route("/:id")
+    .get(ProductService.getProductbyId)
+    .delete(verifyAuth.authenticateToken,verifyAuth.authenAdmin,ProductService.deleteProductbyId)
+    .put(verifyAuth.authenticateToken,verifyAuth.authenAdmin,ProductService.updateProductbyId)
+    app.route("/getVans")
+    .get(ProductService.getVans)
+    app.route("/HomeList")
+    .get(ProductService.getPriority)
+    
 }
