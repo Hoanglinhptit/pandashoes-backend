@@ -1,6 +1,6 @@
 const {Schema,model}= require('mongoose')
 const Image = new Schema({
-    url:{
+    fileName:{
         type: String,
         required: [true]
     },
