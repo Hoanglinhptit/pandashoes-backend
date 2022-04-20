@@ -60,8 +60,7 @@ const getProductByBrand = async (req, res) => {
       dataResponse.push(data)
     }
   }
-  let pagination = utilsPagination.pagination(dataResponse, limit, pageIndex, Product, { brand })
-  res.json(response.success(pagination))
+ utilsPagination.pagination(dataResponse, limit, pageIndex, Product,res, { brand })
 
 }
 const getAllProduct = async (req, res) => {
@@ -93,19 +92,24 @@ const getAllProduct = async (req, res) => {
       dataResponse.push(data)
     }
   }
-  let pagination = utilsPagination.pagination(dataResponse, limit, pageIndex, Product)
-  res.json(response.success(pagination))
+ utilsPagination.pagination(dataResponse, limit, pageIndex, Product,res)
+
 }
 const getHome = (req, res) => {
-  let { pageIndex, limit } = req.query
-  let dataResponse = []
+  let { pageIndex, limit } = req.query;
+  let dataResponse = [];
+  // sua lai categories so nhieu
   Product.find({}).populate('category', '_id name').skip(utilsPagination.getOffset(pageIndex, limit)).limit(parseInt(limit)).exec(async (err, data) => {
+    
     if (err) return res.json(response.error(err))
-    console.log(data);
+    console.log("data",data);
+  
     for (let i = 0; i < data.length; i++) {
+
       if (data[i].image.length > 0) {
 
         let image = await imageService.get_img(data[i].image)
+        console.log("data image: ",data[i].image )
         let dataResult = {
           id: data[i]._id,
           name: data[i].name,
@@ -120,10 +124,18 @@ const getHome = (req, res) => {
           brand: data[i].brand
 
         }
+        console.log("data resut", dataResult);
         dataResponse.push(dataResult)
+       
       }
     }
-    res.json(response.success(utilsPagination.pagination(dataResponse, limit, pageIndex, Product)))
+    
+
+    
+    utilsPagination.pagination(dataResponse, limit, pageIndex, Product, res)
+    console.log(" dataResponse", dataResponse)
+    // res.json(response.success(utilsPagination.pagination(dataResponse, limit, pageIndex, Product, res)))
+  
   })
 }
 const getTypeQuery = (req, res) => {
@@ -144,9 +156,45 @@ const getTypeQuery = (req, res) => {
   }
 
 }
+const deleteProduct = async (req, res) => {
+  const id = req.query.id
+  console.log(req.query);
+  Product.findByIdAndDelete({ _id: id }).exec(async (err, data) => {
+      if (err) return res.json(response.error(err))
+      const log = await Product.find({ category: id })
+      for (let i = 0; i < log.length; i++) {
+          let arrCategory = log[i].category
+          const check = arrCategory.indexOf(data._id)
+          if (check > -1) {
+              arrCategory.splice(check, 1)
+          }
+          await log[i].save()
+      }
+      res.json(response.success({ message: `deleted category ${data.name}` }))
+  })
+
+}
+// const postType =  (req, res) => {
+//   let { type, brand } = req.query
+//   switch (type) {
+//     case "home":
+//       getHome(req, res)
+//       break;
+//     case "product":
+//       if (!brand || brand == null) {
+//         getAllProduct(req, res)
+//       } else {
+//         getProductByBrand(req, res)
+//       }
+//       break;
+//     default: getAllProduct(req, res)
+//       break;
+//   }
+
+// }
 
 module.exports = {
-  createProduct, getTypeQuery,
+  createProduct, getTypeQuery,updateProduct
 }
 
 

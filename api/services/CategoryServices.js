@@ -17,7 +17,9 @@ const getCategory = (req, res) => {
         if (pageIndex === "undefined") {
             Category.find({ name: { $regex: keySearch, $options: 'i' } }).limit(parseInt(limit)).exec((error, data) => {
                 if (error) return res.json(response.error(error))
-                res.json(response.success(data))
+                // res.json(response.success(data))
+                utilsPagination.pagination(data, limit, pageIndex,Category,res, { name: { $regex: keySearch, $options: 'i' } })
+                
             })
         } else if (pageIndex !== "undefined") {
             //search paginate
@@ -39,7 +41,7 @@ const getCategory = (req, res) => {
         } else if (pageIndex === "undefined") {
             Category.find({}).limit(parseInt(limit)).exec((error, data) => {
                 if (error) return res.json(response.error(error))
-                res.json(response.success(data))
+                utilsPagination.pagination(data,limit,pageIndex,Category,res)
             })
         }
     }

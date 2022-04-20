@@ -22,7 +22,7 @@ exports.login = async (req, res) => {
 
             const token = generateAccessToken({
                 email: req.body.email,
-                passWord: req.body.passWord
+               
             });
             res.json(response.success({ token }))
 

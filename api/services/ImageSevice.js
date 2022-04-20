@@ -70,6 +70,7 @@ const upload_multi_img = async function (req, res) {
 
   }
 }
+/// 
 const get_img = async (arrId) => {
   let arrUrl = []
   for (let i = 0; i < arrId.length; i++) {

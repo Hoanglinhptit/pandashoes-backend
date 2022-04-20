@@ -11,11 +11,13 @@ function countTotalPage(totalRecord, limit) {
 
 function pagination(data, limit, pageIndex, model, res, filter) {
     let totalRecord
-
+    
     model.countDocuments(filter || {}).exec(async (err, dataCount) => {
         if (err) return err
         totalRecord = dataCount
+
         let totalPage = countTotalPage(totalRecord, limit)
+        console.log("")
         res.json(response.success({
             limit: parseInt(limit) < 1 ? 1 : parseInt(limit),
             data,
