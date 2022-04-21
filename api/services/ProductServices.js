@@ -96,10 +96,13 @@ const getAllProduct = async (req, res) => {
 
 }
 const getHome = (req, res) => {
-  let { pageIndex, limit } = req.query;
+  let {keySearch, pageIndex, limit } = req.query;
   let dataResponse = [];
+  let objSearch = { $regex: keySearch, $options: 'i' };
   // sua lai categories so nhieu
-  Product.find({}).populate('category', '_id name').skip(utilsPagination.getOffset(pageIndex, limit)).limit(parseInt(limit)).exec(async (err, data) => {
+  Product.find({$or: [
+    { name: objSearch }
+],}).populate('category', '_id name').skip(utilsPagination.getOffset(pageIndex, limit)).limit(parseInt(limit)).exec(async (err, data) => {
     
     if (err) return res.json(response.error(err))
     console.log("data",data);
@@ -132,7 +135,7 @@ const getHome = (req, res) => {
     
 
     
-    utilsPagination.pagination(dataResponse, limit, pageIndex, Product, res)
+    utilsPagination.pagination(dataResponse, limit, pageIndex, Product, res,{ name: { $regex: keySearch, $options: 'i' } })
     console.log(" dataResponse", dataResponse)
     // res.json(response.success(utilsPagination.pagination(dataResponse, limit, pageIndex, Product, res)))
   
@@ -157,23 +160,29 @@ const getTypeQuery = (req, res) => {
 
 }
 const deleteProduct = async (req, res) => {
-  const id = req.query.id
-  console.log(req.query);
-  Product.findByIdAndDelete({ _id: id }).exec(async (err, data) => {
-      if (err) return res.json(response.error(err))
-      const log = await Product.find({ category: id })
-      for (let i = 0; i < log.length; i++) {
-          let arrCategory = log[i].category
-          const check = arrCategory.indexOf(data._id)
-          if (check > -1) {
-              arrCategory.splice(check, 1)
-          }
-          await log[i].save()
-      }
-      res.json(response.success({ message: `deleted category ${data.name}` }))
-  })
+ const { id } = req.params
+const product = await Product.findById(id).populate('image','_id fileName')
+if(!product&& product===null){
+  return res.status(404).json({msg:'err'})
+}else{
+  await product.remove()
+  res.json({msg:"product moved", product})
+}
 
 }
+// Product.findByIdAndDelete({ _id: id }).exec(async (err, data) => {
+//   if (err) return res.json(response.error(err))
+//   const log = await Product.find({ category: id })
+//   for (let i = 0; i < log.length; i++) {
+//       let arrCategory = log[i].category
+//       const check = arrCategory.indexOf(data._id)
+//       if (check > -1) {
+//           arrCategory.splice(check, 1)
+//       }
+//       await log[i].save()
+//   }
+//   res.json(response.success({ message: `deleted category ${data.name}` }))
+// })
 // const postType =  (req, res) => {
 //   let { type, brand } = req.query
 //   switch (type) {
@@ -194,7 +203,7 @@ const deleteProduct = async (req, res) => {
 // }
 
 module.exports = {
-  createProduct, getTypeQuery,updateProduct
+  createProduct, getTypeQuery,updateProduct,deleteProduct
 }
 
 

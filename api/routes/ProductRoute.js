@@ -7,6 +7,7 @@ module.exports = (app) => {
         
     app.route('/product/:id')
     .put(productService.updateProduct)
+    .delete(productService.deleteProduct)
     //     .put(productService)
     //     .delete(productService)
 

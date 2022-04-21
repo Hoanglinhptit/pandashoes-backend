@@ -90,6 +90,7 @@ const deleteCategory = async (req, res) => {
     Category.findByIdAndDelete({ _id: id }).exec(async (err, data) => {
         if (err) return res.json(response.error(err))
         const log = await Product.find({ category: id })
+        console.log("log",log)
         for (let i = 0; i < log.length; i++) {
             let arrCategory = log[i].category
             const check = arrCategory.indexOf(data._id)
@@ -99,9 +100,12 @@ const deleteCategory = async (req, res) => {
             await log[i].save()
         }
         res.json(response.success({ message: `deleted category ${data.name}` }))
+        console.log(`deleted category ${data.name}`)
     })
 
 }
+/// Xoa danh muc va cac san pham lien quan 
+
 module.exports = {
     getCategory, createCategory, updatecategory, deleteCategory,
 }
