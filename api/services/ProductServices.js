@@ -6,6 +6,7 @@ const response = require('../common/response'),
 
 // add product
 const createProduct = async (req, res) => {
+  let {limit,pageIndex}= req.query
   let { name, sku, price, size, shortDescription, description, category, brand, image } = req.body
   const skuCheck = await Product.findOne({ sku })
   console.log(skuCheck);
@@ -16,9 +17,11 @@ const createProduct = async (req, res) => {
   const parseSize = JSON.stringify(size)
   const ProductData = { name, sku, price, size: parseSize, shortDescription, description, category, brand, image }
   const newData = new Product(ProductData)
+
   newData.save((err, data) => {
     if (err) return res.json(response.error({ message: err }))
-    res.json(response.success(data))
+    utilsPagination.pagination(data,limit,null,Product,res)
+    // res.json(response.success(data))
   })
 
 
@@ -98,48 +101,26 @@ const getAllProduct = async (req, res) => {
 const getHome = (req, res) => {
   let {keySearch, pageIndex, limit } = req.query;
   let dataResponse = [];
-  let objSearch = { $regex: keySearch, $options: 'i' };
+  console.log("query",keySearch,pageIndex,limit);
   // sua lai categories so nhieu
-  Product.find({$or: [
-    { name: objSearch }
-],}).populate('category', '_id name').skip(utilsPagination.getOffset(pageIndex, limit)).limit(parseInt(limit)).exec(async (err, data) => {
-    
-    if (err) return res.json(response.error(err))
-    console.log("data",data);
-  
-    for (let i = 0; i < data.length; i++) {
-
-      if (data[i].image.length > 0) {
-
-        let image = await imageService.get_img(data[i].image)
-        console.log("data image: ",data[i].image )
-        let dataResult = {
-          id: data[i]._id,
-          name: data[i].name,
-          sku: data[i].sku,
-          price: data[i].price,
-          isHot: data[i].isHot,
-          size: JSON.parse(data[i].size),
-          shortDescription: data[i].shortDescription,
-          description: data[i].description,
-          category: data[i].category,
-          image,
-          brand: data[i].brand
-
-        }
-        console.log("data resut", dataResult);
-        dataResponse.push(dataResult)
-       
+  if(keySearch!==""){
+    let objSearch = { $regex: keySearch, $options: 'i' };
+    Product.find({name:objSearch},{__v:0}).skip(utilsPagination.getOffset(pageIndex,limit)).limit(parseInt(limit)).populate('image category').exec(
+      (err,data)=>{
+        if(err) res.json(response.error(err))
+        utilsPagination.pagination(data,limit,pageIndex,Product,res,{name:objSearch})
       }
-    }
-    
+    )
 
-    
-    utilsPagination.pagination(dataResponse, limit, pageIndex, Product, res,{ name: { $regex: keySearch, $options: 'i' } })
-    console.log(" dataResponse", dataResponse)
-    // res.json(response.success(utilsPagination.pagination(dataResponse, limit, pageIndex, Product, res)))
-  
-  })
+  }else{
+    Product.find({},{__v:0}).skip(utilsPagination.getOffset(pageIndex,limit)).limit(parseInt(limit)).populate('image category').exec(
+      (err,data)=>{
+        if(err) res.json(response.error(err))
+        utilsPagination.pagination(data,limit,pageIndex,Product,res)
+      }
+    )
+  }
+ 
 }
 const getTypeQuery = (req, res) => {
   let { type, brand } = req.query
@@ -161,15 +142,41 @@ const getTypeQuery = (req, res) => {
 }
 const deleteProduct = async (req, res) => {
  const { id } = req.params
-const product = await Product.findById(id).populate('image','_id fileName')
+const product = await Product.findByIdAndDelete(id)
 if(!product&& product===null){
-  return res.status(404).json({msg:'err'})
-}else{
-  await product.remove()
-  res.json({msg:"product moved", product})
+  let arrImage = product.image
+ for(let i=0;i<arrImage;i++){
+  const checkImage = await Image.findByIdAndDelete({ _id: arrImage[i] })
+  console.log("checkImage",checkImage);
+  if (!checkImage || checkImage == null) {
+    return res.json(response.error({ message: "not found image" }))
+  }
+  let nameImage = checkImage.fileName
+  fs.unlink(`public/image/${nameImage}`, async (err) => {
+    if (err) {
+      return res.json(response.error({ message: err }))
+    }
+    else {
+      res.json(response.success({ message: "delete success" }))
+    }
+
+ })
+}
+ 
+}
 }
 
-}
+
+
+
+// if(!product&& product===null){
+//   return res.status(404).json({msg:'err'})
+// }else{
+//   await product.remove()
+//   res.json({msg:"product moved", product})
+// }
+
+ 
 // Product.findByIdAndDelete({ _id: id }).exec(async (err, data) => {
 //   if (err) return res.json(response.error(err))
 //   const log = await Product.find({ category: id })

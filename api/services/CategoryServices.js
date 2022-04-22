@@ -23,9 +23,11 @@ const getCategory = (req, res) => {
             })
         } else if (pageIndex !== "undefined") {
             //search paginate
+            console.log("pageIndex", pageIndex, " limit", limit, "keySearch", keySearch);
             Category.find({ name: { $regex: keySearch, $options: 'i' } }).skip(utilsPagination.getOffset(pageIndex, limit)).limit(parseInt(limit)).exec((err, data) => {
+
                 if (err) return res.json(response.error(err))
-                utilsPagination.pagination(data, limit, pageIndex, Category, res, { name: { $regex: keySearch, $option: 'i' } })
+                utilsPagination.pagination(data, limit, pageIndex, Category, res, { name: { $regex: keySearch, $options: 'i' } })
 
             })
         }
@@ -59,20 +61,14 @@ const createCategory = async (req, res) => {
     const newCategory = new Category({ name: name })
     newCategory.save((err, data) => {
         if (err) return res.json(response.error(err))
-        Category.countDocuments({ name: { $regex: keySearch, $options: 'i' } }, (err1, data1) => {
-            if (err1) return res.json(response.error(err))
-
-            let dataResult = {
-                data,
-                pageIndex: Math.ceil(data1 / parseInt(limit)),
-                limit, keySearch
+        if(keySearch===""){
+                utilsPagination.pagination(data,limit,null,Category,res)
+            }else  if(keySearch!==""){
+                utilsPagination.pagination(data,limit,null,Category,res,{ name: { $regex: keySearch, $options: 'i' } })
             }
-            console.log(dataResult);
-            res.json(response.success(dataResult))
-        })
-
-
-    })
+        }
+        
+)
 
 }
 const updatecategory = (req, res) => {
@@ -85,6 +81,7 @@ const updatecategory = (req, res) => {
 
 }
 const deleteCategory = async (req, res) => {
+    // const {pageIdx,limit}= req.query
     const id = req.query.id
     console.log(req.query);
     Category.findByIdAndDelete({ _id: id }).exec(async (err, data) => {
