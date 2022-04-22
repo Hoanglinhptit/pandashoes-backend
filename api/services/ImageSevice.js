@@ -16,7 +16,8 @@ const upload_img = async (req, res) => {
     })
   }
   const MyFile = req.files.file
-  let name = `${makeName.ChangeName(10)}.png`
+  let date = Date.now()
+  let name = `${date}.${makeName.ChangeName(10)}.png`
   let image = {}
   console.log(req.files);
   // if (MyFile.size > 1024 * 1024) {
@@ -44,7 +45,9 @@ const upload_img = async (req, res) => {
 const upload_multi_img = async function (req, res) {
   try {
     const files = req.files.Mfile
-
+    if (files.length > 4) {
+      return res.json(response.error("limit 4 image"))
+    }
     let uploadImg = []
     for (let i = 0; i < files.length; i++) {
       let nameImg = req.files.Mfile[i].name
@@ -76,6 +79,7 @@ const get_img = async (arrId) => {
     let result = await Image.findById({ _id: arrId[i] })
     let url = `${domain + result.fileName}`
     let resultImage = {
+      id: result._id,
       isHot: result.isPriority,
       url
     }
