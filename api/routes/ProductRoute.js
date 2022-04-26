@@ -4,9 +4,10 @@ module.exports = (app) => {
     app.route('/product')
         .get(productService.getTypeQuery)
         .post(productService.createProduct)
-        //     .put(productService)
         .delete(productService.deleteProduct)
+        .put(productService.updateProduct)
     app.route('/product/:id')
         .get(productService.getDetailProduct)
+
 
 }
