@@ -44,7 +44,6 @@ const getCategory = (req, res) => {
         } else if (pageIndex === "undefined") {
             Category.find({}).limit(parseInt(limit)).exec((error, data1) => {
                 if (error) return res.json(response.error(error))
-                console.log("data ne", data1);
                 utilsPagination.pagination(data1, keySearch, limit, null, Category, res)
 
             })
