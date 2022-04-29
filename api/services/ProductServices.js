@@ -10,7 +10,7 @@ const response = require('../common/response'),
 
 // add product
 const createProduct = async (req, res) => {
-  const { limit, keySearch, pageIndex } = req.query
+  const { limit, keySearch } = req.query
   let { name, sku, price, size, shortDescription, description, category, brand, image } = req.body
   const skuCheck = await Product.findOne({ sku })
   console.log(skuCheck);
@@ -22,19 +22,37 @@ const createProduct = async (req, res) => {
   const ProductData = { name, sku, price, size: parseSize, shortDescription, description, category, brand, image }
   const newData = new Product(ProductData)
   newData.save((err, data) => {
-    if (err) return res.json(response.error({ message: err }))
+    if (err) return res.json(response.error(err))
+    if (keySearch !== "" && name.includes(keySearch)) {
+        Product.countDocuments({ name: { $regex: keySearch, $options: 'i' } }, (err1, data1) => {
+            if (err1) return res.json(response.error(err))
 
-    if (keySearch !== "") {
-      console.log("heool");
-      utilsPagination.pagination(data, keySearch, limit, null, Product, res, { $or: [{ name: { $regex: keySearch, $options: 'i' } }] })
+            let dataResult = {
+                data,
+                pageIndex: Math.ceil(data1 / parseInt(limit)),
+                limit,
+                keySearch
+            }
+            console.log(dataResult);
+            res.json(response.success(dataResult))
+        })
+    } else {
+      Product.countDocuments({}, (err1, data1) => {
+            if (err1) return res.json(response.error(err))
 
-    } else if (!keySearch || keySearch === "") {
-      console.log("hellio");
+            let dataResult = {
+                data,
+                pageIndex: Math.ceil(data1 / parseInt(limit)),
+                limit,
+            }
+            console.log(dataResult);
+            res.json(response.success(dataResult))
+        })
 
-      utilsPagination.pagination(data, keySearch, limit, null, Product, res)
     }
 
-  })
+
+})
 
 
 }
@@ -146,7 +164,11 @@ const deleteProduct = (req, res) => {
   })
 }
 module.exports = {
+<<<<<<< HEAD
   createProduct, getTypeQuery, getDetailProduct, deleteProduct, updateProduct
+=======
+  createProduct, getTypeQuery, getDetailProduct, deleteProduct,updateProduct
+>>>>>>> 40e5921926f3f0a632a4d5196b7826939996d411
 }
 
 

@@ -44,7 +44,6 @@ const getCategory = (req, res) => {
         } else if (pageIndex === "undefined") {
             Category.find({}).limit(parseInt(limit)).exec((error, data1) => {
                 if (error) return res.json(response.error(error))
-                console.log("data ne", data1);
                 utilsPagination.pagination(data1, keySearch, limit, null, Category, res)
 
             })
@@ -67,7 +66,7 @@ const createCategory = async (req, res) => {
     const newCategory = new Category({ name: name })
     newCategory.save((err, data) => {
         if (err) return res.json(response.error(err))
-        if (keySearch !== "" && name.includes(keySearch)) {
+        if (keySearch !== "" && name.includes(keySearch)) {  /// name.includes(keySearch)
             Category.countDocuments({ name: { $regex: keySearch, $options: 'i' } }, (err1, data1) => {
                 if (err1) return res.json(response.error(err))
 
