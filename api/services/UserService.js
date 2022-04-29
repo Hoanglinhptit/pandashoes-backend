@@ -9,7 +9,7 @@ exports.TOKEN_SECRET = TOKEN_SECRET
 function generateAccessToken(username) {
     return jwt.sign(username, TOKEN_SECRET, { expiresIn: '1800s' });
 }
-exports.login = async (req, res) => {
+const login = async (req, res) => {
     const { email, passWord } = req.body
     const userChek = await User.findOne({ email })
     // const passWordCheck = await User.findOne({passWord})
@@ -35,7 +35,7 @@ exports.login = async (req, res) => {
 }
 
 
-exports.Register = async (req, res) => {
+const register = async (req, res) => {
     const { firstName, lastName, email, passWord, address, initSecret, phone } = req.body
     const emailCheck = await User.findOne({ email })
     if (emailCheck || emailCheck !== null) {
@@ -51,4 +51,23 @@ exports.Register = async (req, res) => {
     res.json(response.success(
         saveUser
     ))
+}
+const getUser = (req, res) => {
+
+}
+const getUserDetail = (req, res) => {
+
+}
+const addUser = (req, res) => {
+
+}
+const updateUser = (req, res) => {
+
+}
+const deleteUser = (req, res) => {
+
+}
+module.exports = {
+    getUser, getUserDetail, addUser, updateUser, deleteUser, register, login
+
 }

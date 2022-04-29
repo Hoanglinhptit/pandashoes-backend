@@ -101,8 +101,8 @@ const createCategory = async (req, res) => {
 }
 const updatecategory = (req, res) => {
     const id = req.query.id
-    const { name } = req.body
-    Category.findByIdAndUpdate({ _id: id }, { name: name }).exec((err, data) => {
+    const { name, isHot } = req.body
+    Category.findByIdAndUpdate({ _id: id }, { $set: { name, isHot } }, { new: true }).exec((err, data) => {
         if (err) return res.json(response.error(err))
         res.json(response.success(data))
     })
@@ -126,6 +126,13 @@ const deleteCategory = async (req, res) => {
     })
 
 }
+const getCategoryDetail = (req, res) => {
+    const { id } = req.params
+    Category.findById({ _id: id }, { __v: 0 }, (err, data) => {
+        if (err) return res.json(response.error(err))
+        res.json(response.success(data))
+    })
+}
 module.exports = {
-    getCategory, createCategory, updatecategory, deleteCategory,
+    getCategory, createCategory, updatecategory, deleteCategory, getCategoryDetail
 }

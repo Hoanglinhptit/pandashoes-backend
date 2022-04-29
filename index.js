@@ -7,7 +7,6 @@ const routes = require("./api/routes")
 require('./api/models')
 const path = require("path");
 const fileUpload = require('express-fileupload')
-
 app.use(express.static(path.join(__dirname, "public/image")));// let storage = multer.diskStorage({
 
 app.use(cors())

@@ -39,11 +39,19 @@ const createProduct = async (req, res) => {
 
 }
 const updateProduct = (req, res) => {
-  const id = req.query
-  const { name, sku, price, size, shortDescription, description, category, brand, image } = req.body
-  Product.findOneAndUpdate({ _id: id }, { name, sku, price, size, shortDescription, description, category, brand, image }, (error, data) => {
-    if (error) return res.json(response.error(error))
-    res.json(response.success(data))
+  const { id } = req.query
+  const { name, sku, price, size, shortDescription, description, category, brand, image, isHot } = req.body
+  let dataNew = {
+    name, sku, price, size: JSON.stringify(size), shortDescription, description, category: category.map((item) => { return item.id }), brand, image: image.map(item => { return item._id }), isHot
+  }
+  console.log("data", dataNew);
+  Product.findByIdAndUpdate({ _id: id }, {
+    $set: dataNew
+  }, { new: true }).exec((err, data) => {
+    if (err) return res.json(response.error(err))
+    console.log("dataFinal", data);
+    utilsPagination.pagination(data, null, null, null, Product, res,)
+
   })
 }
 
@@ -138,7 +146,7 @@ const deleteProduct = (req, res) => {
   })
 }
 module.exports = {
-  createProduct, getTypeQuery, getDetailProduct, deleteProduct
+  createProduct, getTypeQuery, getDetailProduct, deleteProduct, updateProduct
 }
 
 
