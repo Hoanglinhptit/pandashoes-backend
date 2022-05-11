@@ -89,6 +89,9 @@ const get_img_media = (req, res) => {
   }
 
 }
+get_img_media_detail = (req, res) => {
+  const {id}= req.query
+}
 
 
 const delete_image = async (req, res) => {

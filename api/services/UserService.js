@@ -25,7 +25,7 @@ const login = async (req, res) => {
                 email: req.body.email,
                 passWord: req.body.passWord
             });
-            res.json(response.success({ token }))
+            res.json(response.success({ token, user: userChek._id, name: userChek.firstName + userChek.lastName }))
 
         } else {
             res.json(response.error({ message: 'sai mat khau' }))
@@ -35,6 +35,25 @@ const login = async (req, res) => {
     }
 }
 
+// const data = {
+//     fields: [
+//         {
+//             keyName: "date",
+//             type: 123,
+//             filterOptions: {
+//                 isFilter: true,
+//                 typeFilter: "date"
+//             }
+//         }
+//     ]
+// }
+
+// const body = {
+//     filterOption: {
+//         "email": "123213",
+//         "dsadlasdsa": "12321321"
+//     }
+// }
 
 const register = async (req, res) => {
     const { firstName, lastName, email, passWord, address, initSecret, phone } = req.body
@@ -53,7 +72,7 @@ const register = async (req, res) => {
         saveUser
     ))
 }
-const addUserCms = (req, res) => {
+const addUserCms = async (req, res) => {
     const { firstName, lastName, email, passWord, address, initSecret, phone, role } = req.body
     const { keySearch, limit } = req.query
     const emailCheck = await User.findOne({ email })

@@ -110,11 +110,41 @@ const getHome = (req, res) => {
 
 const getDetailProduct = async (req, res) => {
   const { id } = req.params
-  Product.findById({ _id: id }, { __v: 0 }, async (error, data) => {
+  Product.findById({ _id: id }, { __v: 0 }, { new: true }, (error, data) => {
     if (error) return res.json(response.error(error))
-    utilsPagination.pagination(data, null, null, null, Product, res)
+    Product.updateOne({ _id: id }, { views: data.views + 1 }, { new: true }, (err, data1) => {
+      if (err) return res.json(response.error(err))
+      console.log(data1);
+      utilsPagination.pagination(data, null, null, null, Product, res)
+    })
+
   }).populate([{ path: 'image', select: ' _id isPriority fileName', model: Image }, { path: 'category', select: '_id name isHot', model: Category }]) //2 cachs 1 laf dung " image category" 2 la dung mang [{path:'image',select:'select 1',model:'Image'},{path:'category',select:'select 1',model:'category'}]
 
+}
+const getRelateProduct = (req, res) => {
+  const { id, pageIndex, limit } = req.query
+  Product.findById({ _id: id }, { __v: 0 }, (err, data) => {
+    if (err) return res.json(response.error(err))
+    if (pageIndex) {
+      Product.find({
+        $or: [{ category: data.category }, { price: { $regex: data.price } }, { brand: data.brand }]
+      }).limit(parseInt(limit)).exec((err, data1) => {
+        if (err) return res.json(response.error(err))
+        utilsPagination.pagination(data1, "", limit, pageIndex, Product, res, {
+          $or: [{ category: data.category }, { price: { $regex: data.price } }, { brand: data.brand }]
+        })
+      })
+    } else {
+      Product.find({
+        $or: [{ category: data.category }, { price: { $regex: data.price } }, { brand: data.brand }]
+      }).exec((err, data1) => {
+        if (err) return res.json(response.error(err))
+        utilsPagination.pagination(data1, "", limit, pageIndex, Product, res, {
+          $or: [{ category: data.category }, { price: { $regex: data.price } }, { brand: data.brand }]
+        })
+      })
+    }
+  })
 }
 const getTypeQuery = (req, res) => {
   let { type, brand } = req.query
@@ -146,7 +176,7 @@ const deleteProduct = (req, res) => {
   })
 }
 module.exports = {
-  createProduct, getTypeQuery, getDetailProduct, deleteProduct, updateProduct
+  createProduct, getTypeQuery, getDetailProduct, deleteProduct, updateProduct, getRelateProduct
 }
 
 

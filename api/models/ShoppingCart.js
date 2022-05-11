@@ -6,6 +6,12 @@ const ShoppingCart = new Schema({
             ref: 'Product'
         }
     ],
+    cart:
+    {
+        type: String,
+        required: true
+    }
+    ,
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User'

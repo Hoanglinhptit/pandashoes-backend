@@ -1,22 +1,29 @@
-const {Schema,model}= require('mongoose')
+const { Schema, model } = require('mongoose')
 const Bill = new Schema({
     user: {
-        type:Schema.Types.ObjectId
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     },
-    productBill:[
-        {
-            type:Schema.Types.ObjectId
-        }
-    ],
-    payment:{
-        type:Number,
-        required:[true]
-    }, 
-    status:{
-        type:String,
-        enum:[]
+    // productBill: [
+    //     {
+    //         type: Schema.Types.ObjectId,
+    //         ref: 'ProductBill'
+    //     }
+    // ],
+    products: {
+        type: String,
+        required: true
+    },
+    payment: {
+        type: Number,
+        required: [true]
+    },
+    status: {
+        type: String,
+        enum: ["processing", "received", "shipping", 'completed'],
+        default: 'processing'
     }
-},{
-    timestamps:true,
+}, {
+    timestamps: true,
 })
-module.exports = model('Bill',Bill)
+module.exports = model('Bill', Bill)
