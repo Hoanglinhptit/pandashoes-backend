@@ -164,11 +164,11 @@ const deleteProduct = (req, res) => {
   })
 }
 module.exports = {
-<<<<<<< HEAD
-  createProduct, getTypeQuery, getDetailProduct, deleteProduct, updateProduct
-=======
-  createProduct, getTypeQuery, getDetailProduct, deleteProduct,updateProduct
->>>>>>> 40e5921926f3f0a632a4d5196b7826939996d411
+// <<<<<<< HEAD
+  createProduct, getTypeQuery, getDetailProduct, deleteProduct, updateProduct,
+// =======
+  // createProduct, getTypeQuery, getDetailProduct, deleteProduct,updateProduct
+// >>>>>>> 40e5921926f3f0a632a4d5196b7826939996d411
 }
 
 
