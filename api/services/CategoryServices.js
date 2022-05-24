@@ -1,4 +1,3 @@
-const { query } = require('express')
 
 const response = require('../common/response'),
     { model } = require('mongoose'),
@@ -22,6 +21,8 @@ const getCategory = (req, res) => {
             })
 
         } else if (pageIndex !== "undefined") {
+
+
             //search paginate
 
             Category.find({ name: { $regex: keySearch, $options: 'i' } }).skip(utilsPagination.getOffset(pageIndex, limit)).limit(parseInt(limit)).exec((err, data) => {

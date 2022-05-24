@@ -36,6 +36,7 @@ const Product = new Schema({
     ],
     views: {
         type: Number,
+        default: 1
 
     },
     image: [

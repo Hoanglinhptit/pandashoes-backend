@@ -2,6 +2,7 @@ const path = require("path");
 const fs = require('fs')
 const { model } = require('mongoose')
 const response = require('../common/response')
+const resJson = require('../utils/pagination')
 const makeName = require("../utils/ChangeName"),
   Image = model('Image')
 const domain = 'http://localhost:3001/'
@@ -73,21 +74,25 @@ const upload_multi_img = async function (req, res) {
 
   }
 }
-const get_img = async (arrId) => {
-  let arrUrl = []
-  for (let i = 0; i < arrId.length; i++) {
-    let result = await Image.findById({ _id: arrId[i] })
-    let url = `${domain + result.fileName}`
-    let resultImage = {
-      id: result._id,
-      isHot: result.isPriority,
-      url
-    }
-    arrUrl.push(resultImage)
-
+const get_img_media = (req, res) => {
+  const { keySearch, pageIndex, limit } = req.query
+  if (keySearch !== "") {
+    Image.find({ keySearch: { $regex: keySearch, $options: 'i' } }, { __v: 0 }, { skip: resJson.getOffset(pageIndex, limit), limit: parseInt(limit) }, (err, data) => {
+      if (err) return res.json(response.error(err))
+      resJson.pagination(data, keySearch, limit, pageIndex, Image, res, { keySearch: { $regex: keySearch, $options: 'i' } })
+    })
+  } else {
+    Image.find({}, { __v: 0 }, { skip: resJson.getOffset(pageIndex, limit), limit: parseInt(limit) }, (err, data) => {
+      if (err) return res.json(response.error(err))
+      resJson.pagination(data, "", limit, pageIndex, Image, res)
+    })
   }
-  return arrUrl
+
 }
+get_img_media_detail = (req, res) => {
+  const {id}= req.query
+}
+
 
 const delete_image = async (req, res) => {
   const id = req.query.id
@@ -111,5 +116,5 @@ module.exports = {
   upload_img,
   upload_multi_img,
   delete_image,
-  get_img
+  get_img_media
 }

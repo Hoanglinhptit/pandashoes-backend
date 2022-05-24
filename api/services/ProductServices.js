@@ -10,7 +10,7 @@ const response = require('../common/response'),
 
 // add product
 const createProduct = async (req, res) => {
-  const { limit, keySearch } = req.query
+  const { limit, keySearch, pageIndex } = req.query
   let { name, sku, price, size, shortDescription, description, category, brand, image } = req.body
   const skuCheck = await Product.findOne({ sku })
   console.log(skuCheck);
@@ -22,37 +22,19 @@ const createProduct = async (req, res) => {
   const ProductData = { name, sku, price, size: parseSize, shortDescription, description, category, brand, image }
   const newData = new Product(ProductData)
   newData.save((err, data) => {
-    if (err) return res.json(response.error(err))
-    if (keySearch !== "" && name.includes(keySearch)) {
-        Product.countDocuments({ name: { $regex: keySearch, $options: 'i' } }, (err1, data1) => {
-            if (err1) return res.json(response.error(err))
+    if (err) return res.json(response.error({ message: err }))
 
-            let dataResult = {
-                data,
-                pageIndex: Math.ceil(data1 / parseInt(limit)),
-                limit,
-                keySearch
-            }
-            console.log(dataResult);
-            res.json(response.success(dataResult))
-        })
-    } else {
-      Product.countDocuments({}, (err1, data1) => {
-            if (err1) return res.json(response.error(err))
+    if (keySearch !== "") {
+      console.log("heool");
+      utilsPagination.pagination(data, keySearch, limit, null, Product, res, { $or: [{ name: { $regex: keySearch, $options: 'i' } }] })
 
-            let dataResult = {
-                data,
-                pageIndex: Math.ceil(data1 / parseInt(limit)),
-                limit,
-            }
-            console.log(dataResult);
-            res.json(response.success(dataResult))
-        })
+    } else if (!keySearch || keySearch === "") {
+      console.log("hellio");
 
+      utilsPagination.pagination(data, keySearch, limit, null, Product, res)
     }
 
-
-})
+  })
 
 
 }
@@ -120,7 +102,7 @@ const getHome = (req, res) => {
 
     .exec(async (err, data) => {
       if (err) return res.json(response.error(err))
-      console.log(data);
+      // console.log(data);
 
       utilsPagination.pagination(data, null, limit, pageIndex, Product, res)
     })
@@ -128,11 +110,41 @@ const getHome = (req, res) => {
 
 const getDetailProduct = async (req, res) => {
   const { id } = req.params
-  Product.findById({ _id: id }, { __v: 0 }, async (error, data) => {
+  Product.findById({ _id: id }, { __v: 0 }, { new: true }, (error, data) => {
     if (error) return res.json(response.error(error))
-    utilsPagination.pagination(data, null, null, null, Product, res)
+    Product.updateOne({ _id: id }, { views: data.views + 1 }, { new: true }, (err, data1) => {
+      if (err) return res.json(response.error(err))
+      console.log(data1);
+      utilsPagination.pagination(data, null, null, null, Product, res)
+    })
+
   }).populate([{ path: 'image', select: ' _id isPriority fileName', model: Image }, { path: 'category', select: '_id name isHot', model: Category }]) //2 cachs 1 laf dung " image category" 2 la dung mang [{path:'image',select:'select 1',model:'Image'},{path:'category',select:'select 1',model:'category'}]
 
+}
+const getRelateProduct = (req, res) => {
+  const { id, pageIndex, limit } = req.query
+  Product.findById({ _id: id }, { __v: 0 }, (err, data) => {
+    if (err) return res.json(response.error(err))
+    if (pageIndex) {
+      Product.find({
+        $or: [{ category: data.category }, { price: { $regex: data.price } }, { brand: data.brand }]
+      }).limit(parseInt(limit)).exec((err, data1) => {
+        if (err) return res.json(response.error(err))
+        utilsPagination.pagination(data1, "", limit, pageIndex, Product, res, {
+          $or: [{ category: data.category }, { price: { $regex: data.price } }, { brand: data.brand }]
+        })
+      })
+    } else {
+      Product.find({
+        $or: [{ category: data.category }, { price: { $regex: data.price } }, { brand: data.brand }]
+      }).exec((err, data1) => {
+        if (err) return res.json(response.error(err))
+        utilsPagination.pagination(data1, "", limit, pageIndex, Product, res, {
+          $or: [{ category: data.category }, { price: { $regex: data.price } }, { brand: data.brand }]
+        })
+      })
+    }
+  })
 }
 const getTypeQuery = (req, res) => {
   let { type, brand } = req.query
@@ -164,11 +176,7 @@ const deleteProduct = (req, res) => {
   })
 }
 module.exports = {
-// <<<<<<< HEAD
-  createProduct, getTypeQuery, getDetailProduct, deleteProduct, updateProduct,
-// =======
-  // createProduct, getTypeQuery, getDetailProduct, deleteProduct,updateProduct
-// >>>>>>> 40e5921926f3f0a632a4d5196b7826939996d411
+  createProduct, getTypeQuery, getDetailProduct, deleteProduct, updateProduct, getRelateProduct
 }
 
 

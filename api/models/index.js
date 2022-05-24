@@ -5,13 +5,14 @@ const ProductBills = require('./ProductBills')
 const User = require('./User')
 const Category = require('./Category')
 const ShoppingCart = require('./ShoppingCart')
+const News = require('./News')
 
 module.exports = {
     Bill,
-    Image, 
+    Image,
     Product,
     ProductBills,
     User,
     ShoppingCart,
-    Category
+    Category, News
 }

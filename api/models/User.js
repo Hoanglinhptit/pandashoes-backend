@@ -1,54 +1,58 @@
 
-const {Schema,model}= require('mongoose')
+const { Schema, model } = require('mongoose')
 const User = new Schema({
-    firstName:{
-        type:String,
-        required:[true]
+    firstName: {
+        type: String,
+        required: [true]
     },
-    lastName:{
-        type:String,
-        required:[true]
+    lastName: {
+        type: String,
+        required: [true]
     },
-    email:{
-        type:String,
-        required:[true]
+    email: {
+        type: String,
+        required: [true]
     },
-    passWord:{
-        type:String,
-        required:[true]
+    phone: {
+        type: String,
+        required: true
     },
-    address:{
-        type:String,
-        required:[true]
+    passWord: {
+        type: String,
+        required: [true]
     },
-    initSecret:{
-        type:String,
-        required:[true]
+    address: {
+        type: String,
+        required: [true]
     },
-    role:{
-        type:String,
-        enum:['user','admin'],
-        default:'user'
+    initSecret: {
+        type: String,
+        required: [true]
     },
-    historyShopping:[
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
+    historyShopping: [
         {
             type: Schema.Types.ObjectId,
-            ref:"Bill"
+            ref: "Bill"
         }
     ],
-    favourite:[
+    favourite: [
         {
             type: Schema.Types.ObjectId,
             ref: "Product"
         }
     ],
-    cart:{
+    cart: {
         type: Schema.Types.ObjectId,
         ref: 'ShoppingCart'
     }
 
-    
-},{
-    timestamps:true,
+
+}, {
+    timestamps: true,
 })
-module.exports = model('User',User)
+module.exports = model('User', User)
