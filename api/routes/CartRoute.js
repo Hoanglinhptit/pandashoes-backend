@@ -5,5 +5,7 @@ module.exports = (app) => {
         .post(cartServices.addCart)
     // .put(categoryServices.updatecategory)
     // .delete(categoryServices.deleteCategory)
+    app.route('/productCart')
+        .post(cartServices.findProductCart)
 
 }

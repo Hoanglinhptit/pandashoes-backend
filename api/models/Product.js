@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose')
+const moment = require('moment')
 const Product = new Schema({
     name: {
         type: String,
@@ -14,7 +15,10 @@ const Product = new Schema({
     },
     isHot: {
         type: Boolean,
-        default: false
+        default: false,
+        index: 1,
+
+
     },
     size: {
         type: Schema.Types.String,
@@ -31,7 +35,8 @@ const Product = new Schema({
     category: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'Category'
+            ref: 'Category',
+            index: 1,
         }
     ],
     views: {
@@ -48,9 +53,14 @@ const Product = new Schema({
     brand: {
         type: String,
         required: [true]
+    },
+    time: {
+        type: String,
+        default: moment(new Date()).format('DD/MM/YYYY')
     }
 },
     {
         timestamps: true,
     })
+Product.index({ '$**': 'text' })
 module.exports = model('Product', Product)

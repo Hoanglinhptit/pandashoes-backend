@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose')
+const moment = require('moment')
 const News = new Schema(
     {
         title: {
@@ -20,6 +21,10 @@ const News = new Schema(
         views: {
             type: Number,
             default: 1
+        },
+        time: {
+            type: String,
+            default: moment(new Date()).format('DD/MM/YYYY')
         }
 
     },
@@ -27,4 +32,5 @@ const News = new Schema(
         timestamps: true,
     }
 )
+News.index({ '$**': 'text' })
 module.exports = model('News', News)

@@ -1,9 +1,9 @@
 const response = require('../common/response')
 const { model } = require('mongoose')
 const CartRoute = require('../routes/CartRoute')
-const { Product } = require('../models')
 const ShoppingCart = model('ShoppingCart')
 const Image = model('Image')
+const Product = model('Product')
 const addCart = (req, res) => {
     const { products, user } = req.body
 
@@ -71,6 +71,34 @@ const deleteAllProductCart = (req, res) => {
 
 
 }
+
+const findProductCart = (req, res) => {
+    const { cart } = req.body
+    console.log("log", cart)
+    let cartRes = []
+    for (let i = 0; i < cart.length; i++) {
+        Product.findById({ _id: cart[i].id }, { __v: 0 }, (err, data) => {
+            if (err) return res.json(err)
+            console.log(data)
+            cartRes.push({
+                id: cart[i].id,
+                name: data.name,
+                price: data.price,
+                quantity: cart[i].quantity,
+                size: cart[i].size
+            })
+            if (i === cart.length - 1) {
+                console.log("cart", cartRes);
+                res.json(response.success(cartRes))
+            }
+        }
+
+        )
+
+
+    }
+
+}
 const getCart = (req, res) => {
     const idUser = req.query.id
 
@@ -103,6 +131,6 @@ const getCart = (req, res) => {
 
 
 module.exports = {
-    getCart, addCart, updateCart, deleteAllProductCart, deleteProductInCart
+    getCart, addCart, updateCart, deleteAllProductCart, deleteProductInCart, findProductCart
 
 }

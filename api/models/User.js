@@ -1,5 +1,7 @@
 
 const { Schema, model } = require('mongoose')
+//const mongoosastic = require('mongoosastic')
+const moment = require('moment')
 const User = new Schema({
     firstName: {
         type: String,
@@ -11,7 +13,8 @@ const User = new Schema({
     },
     email: {
         type: String,
-        required: [true]
+        required: [true],
+        index: { unique: true }
     },
     phone: {
         type: String,
@@ -49,10 +52,65 @@ const User = new Schema({
     cart: {
         type: Schema.Types.ObjectId,
         ref: 'ShoppingCart'
+    },
+    time: {
+        type: String,
+        default: moment(new Date()).format('DD/MM/YYYY'),
+        es_indexed: true
     }
 
 
 }, {
     timestamps: true,
 })
+User.index({ "$**": 'text' })
 module.exports = model('User', User)
+//User.plugin(mongoosastic)
+// User.createMapping({
+//     "settings": {
+//         "analysis": {
+//             "analyzer": {
+//                 "my_analyzer": {
+//                     "type": "custom",
+//                     "tokenizer": "",
+//                     "char_filter": ["my_pattern"],
+//                     "filter": ["lowercase"]
+//                 }
+//             },
+//             "char_filter": {
+//                 "my_pattern": {
+//                     "type": "pattern_replace",
+//                     "pattern": "\\.",
+//                     "replacement": " "
+//                 }
+//             }
+//         }
+//     },
+//     "mappings": {
+//         "User": {
+//             "dynamic_templates": [{
+//                 "strings": {
+//                     "match_mapping_type": "string",
+//                     "mapping": {
+//                         "type": "text",
+//                         "fields": {
+//                             "keyword": {
+//                                 "type": "keyword"
+//                             }
+//                         }
+//                     }
+//                 }
+//             }],
+
+//         }
+//     }
+// }, (err, mapping) => {
+//     if (err) {
+//         console.log('error creating mapping (you can safely ignore this)');
+//         console.log(err);
+//     } else {
+//         console.log('mapping created!');
+//         console.log(mapping);
+//     }
+//}
+//);
