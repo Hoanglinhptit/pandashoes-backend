@@ -4,6 +4,6 @@ module.exports = (app) => {
         .get(cartServices.getCart)
         .post(cartServices.addCart)
     // .put(categoryServices.updatecategory)
-    // .delete(categoryServices.deleteCategory)
+    .delete(cartServices.deleteProductInCart)
 
 }
