@@ -17,10 +17,10 @@ const ProductBills = new Schema({
         type: Number,
         required: [true]
     },
-    time: {
-        type: String,
-        default: moment(new Date()).format('DD/MM/YYYY')
-    }
+    // time: {
+    //     type: String,
+    //     default: moment(new Date()).format('DD/MM/YYYY')
+    // }
 
 }, {
     timestamps: true,

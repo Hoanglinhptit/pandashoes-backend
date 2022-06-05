@@ -8,7 +8,8 @@ const Image = new Schema({
     isPriority: {
         type: Boolean,
         default: false
-    }, time: {
+    }, 
+    time: {
         type: String,
         default: moment(new Date()).format('DD/MM/YYYY')
     }

@@ -1,7 +1,7 @@
 
 const { Schema, model } = require('mongoose')
 //const mongoosastic = require('mongoosastic')
-const moment = require('moment')
+// const moment = require('moment')
 const User = new Schema({
     firstName: {
         type: String,
@@ -53,11 +53,11 @@ const User = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'ShoppingCart'
     },
-    time: {
-        type: String,
-        default: moment(new Date()).format('DD/MM/YYYY'),
-        es_indexed: true
-    }
+    // time: {
+    //     type: String,
+    //     default: moment(new Date()).format('DD/MM/YYYY'),
+    //     es_indexed: true
+    // }
 
 
 }, {

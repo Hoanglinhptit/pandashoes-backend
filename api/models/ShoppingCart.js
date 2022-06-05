@@ -17,10 +17,10 @@ const ShoppingCart = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    time: {
-        type: String,
-        default: moment(new Date()).format('DD/MM/YYYY')
-    }
+    // time: {
+    //     type: String,
+    //     default: moment(new Date()).format('DD/MM/YYYY')
+    // }
 
 }, {
     timestamps: true,
