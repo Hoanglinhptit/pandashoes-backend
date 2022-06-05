@@ -8,7 +8,8 @@ module.exports = (app) => {
                 .put(productService.updateProduct)
         app.route('/product/:id')
                 .get(productService.getDetailProduct)
-
+        app.route('/product-filter')
+                .get(productService.filterOptions)
 
 
 }

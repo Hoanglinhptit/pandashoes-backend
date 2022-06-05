@@ -7,7 +7,7 @@ const response = require('../common/response'),
   Category = model('Category'),
   utilsPagination = require('../utils/pagination'),
   imageService = require('../services/ImageSevice')
-
+const filterFunction = require('../common/filterOptions')
 // add product
 const createProduct = async (req, res) => {
   const { limit, keySearch, pageIndex } = req.query
@@ -175,8 +175,13 @@ const deleteProduct = (req, res) => {
     }
   })
 }
+const filterOptions = (req, res) => {
+  const { options } = req.body
+  const { pageIndex, limit } = req.query
+  filterFunction.filterOptions(options, pageIndex, limit, Bill, res)
+}
 module.exports = {
-  createProduct, getTypeQuery, getDetailProduct, deleteProduct, updateProduct, getRelateProduct
+  createProduct, getTypeQuery, getDetailProduct, deleteProduct, updateProduct, getRelateProduct, filterOptions
 }
 
 

@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose')
+const moment = require('moment')
 const Bill = new Schema({
     user: {
         type: Schema.Types.ObjectId,
@@ -12,7 +13,8 @@ const Bill = new Schema({
     // ],
     products: {
         type: String,
-        required: true
+        required: true,
+        index: true
     },
     payment: {
         type: Number,
@@ -21,9 +23,16 @@ const Bill = new Schema({
     status: {
         type: String,
         enum: ["processing", "received", "shipping", 'completed'],
-        default: 'processing'
+        default: 'processing',
+
+    },
+    time: {
+        type: String,
+        default: moment(new Date()).format('DD/MM/YYYY')
     }
+
 }, {
-    timestamps: true,
+    timestamps: true
 })
+Bill.index({ '$**':'text' })
 module.exports = model('Bill', Bill)

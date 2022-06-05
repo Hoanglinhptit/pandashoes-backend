@@ -4,6 +4,8 @@ const Product = model('Product')
 const User = model('User')
 const response = require('../common/response')
 const resJson = require('../utils/pagination')
+const filterFunction = require('../common/filterOptions')
+const moment = require('moment')
 const getBill = (req, res) => {
     const { status, pageIndex, limit } = req.query
     Bill.find({ status }, { __v: 0 }, (err, data) => {
@@ -38,7 +40,7 @@ const addBill = (req, res) => {
 const updateStateBill = (req, res) => {
     const { status } = req.body
     const { id } = req.query
-    Bill.findByIdAndUpdate({ _id: id }, { status }, { new: true }, (err, data) => {
+    Bill.findByIdAndUpdate({ _id: id }, { status: status.status }, { new: true }, (err, data) => {
 
         if (err) return res.json(response.error(err))
         res.json(response.success(data))
@@ -83,14 +85,16 @@ const getDetailHistoryUser = async (req, res) => {
                     price: product[i].price,
                     quantity: product[i].quantity
                 })
-                console.log(data1);
+
                 if (i === product.length - 1) {
                     res.json(response.success({
+
+                        _id: data._id,
                         product: arrProduct,
                         payment: data.payment,
                         status: data.status,
-                        createAt: data.createAt,
-                        updateAt: data.updateAt
+                        createAt: moment(data.createdAt).utcOffset(7).format("DD/MM/YYYY hh:mm A"),
+                        updateAt: moment(data.updatedAt).utcOffset(7).format("DD/MM/YYYY hh:mm A")
                     }))
                 }
 
@@ -113,6 +117,23 @@ const getBillsOfUser = (req, res) => {
 
 
 }
+const filterOptions = (req, res) => {
+    const { options } = req.body
+    const { pageIndex, limit } = req.query
+    // filterFunction.filterOptions(options, pageIndex, limit, Bill, res)
+    try {
+        console.log(options);
+        Bill.find(options, { __v: 0 }).skip(resJson.getOffset(pageIndex, limit)).limit(parseInt(limit))
+            .exec((err, data) => {
+                if (err) return res.json(response.error(err))
+                console.log("data", data);
+                resJson.pagination(data, options, limit, pageIndex, Bill, res)
+            })
+    } catch (error) {
+        return res.json(response.error(error))
+
+    }
+}
 const getType = (req, res) => {
     const { type } = req.query
     switch (type) {
@@ -122,10 +143,11 @@ const getType = (req, res) => {
         case "user":
             getBillsOfUser(req, res)
             break;
+
         default:
             getBill(req, res);
     }
 }
 module.exports = {
-    getDetailHistoryUser, getType, addBill, updateStateBill, deleteBill,
+    getDetailHistoryUser, getType, addBill, updateStateBill, deleteBill, filterOptions
 }

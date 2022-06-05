@@ -9,10 +9,10 @@ function countTotalPage(totalRecord, limit) {
     return Math.ceil(totalRecord / parseInt(limit))
 }
 
-function pagination(data, keySearch, limit, pageIndex, model, res, filter) {
+function pagination(data, keySearch, limit, pageIndex, model, res) {
     let totalRecord
 
-    model.countDocuments(filter || {}).exec(async (err, dataCount) => {
+    model.countDocuments(keySearch || {}).exec(async (err, dataCount) => {
         if (err) return err
         totalRecord = dataCount
         let totalPage = countTotalPage(totalRecord, limit)

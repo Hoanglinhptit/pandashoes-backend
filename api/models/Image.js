@@ -1,14 +1,19 @@
-const {Schema,model}= require('mongoose')
+const { Schema, model } = require('mongoose')
+const moment = require('moment')
 const Image = new Schema({
-    fileName:{
+    fileName: {
         type: String,
         required: [true]
     },
-    isPriority:{
+    isPriority: {
         type: Boolean,
-        default:false
+        default: false
+    }, time: {
+        type: String,
+        default: moment(new Date()).format('DD/MM/YYYY')
     }
-},{
-    timestamps:true,
+}, {
+    timestamps: true,
 })
-module.exports= model('Image',Image)
+Image.index({ '$**': 'text' })
+module.exports = model('Image', Image)
