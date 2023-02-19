@@ -36,3 +36,4 @@ const Bill = new Schema({
 })
 Bill.index({ '$**':'text' })
 module.exports = model('Bill', Bill)
+

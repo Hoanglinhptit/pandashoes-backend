@@ -114,8 +114,7 @@ const addUserCms = async (req, res) => {
 
     }
 }
-const
-    getUser = (req, res) => {
+const getUser = (req, res) => {
         const { keySearch, pageIndex, limit } = req.query
         if (keySearch !== "") {
             User.find({ $or: [{ firstName: { $regex: keySearch, $options: 'i' } }, { lastName: { $regex: keySearch, $options: 'i' } }] }, { __v: 0 }, (err, data) => {

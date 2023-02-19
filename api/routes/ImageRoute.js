@@ -5,12 +5,11 @@ module.exports = (app) => {
         .post(imageService.upload_img)
 
         .delete(imageService.delete_image)
-    app.route('/imageMedia')
         .get(imageService.get_img_media)
         .delete(imageService.delete_image)
 
 
-    app.route('/multiImage')
+    app.route('/multi-image')
         .post(imageService.upload_multi_img)
 
 }

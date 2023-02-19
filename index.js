@@ -1,11 +1,12 @@
 const express = require("express");
 const app = express();
+const path = require("path");
 const mongoose = require("mongoose")
 const cors = require("cors")
+const io = require("socket.io")
 mongoose.Promise = global.Promise;
 const routes = require("./api/routes")
 require('./api/models')
-const path = require("path");
 const fileUpload = require('express-fileupload')
 app.use(express.static(path.join(__dirname, "public/image")));// let storage = multer.diskStorage({
 

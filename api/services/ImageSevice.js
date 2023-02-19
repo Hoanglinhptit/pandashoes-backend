@@ -2,7 +2,8 @@ const path = require("path");
 const fs = require('fs')
 const { model } = require('mongoose')
 const response = require('../common/response')
-const resJson = require('../utils/pagination')
+const resJson = require('../utils/pagination');
+const { log } = require("console");
 const makeName = require("../utils/ChangeName"),
   Image = model('Image')
 const domain = 'http://localhost:3001/'
@@ -45,18 +46,28 @@ const upload_img = async (req, res) => {
 
 const upload_multi_img = async function (req, res) {
   try {
-    const files = req.files.Mfile
+
+    const files = req.files
+    console.log("array of files",files)
+  //   for(let propName in files) {
+  //     if(files.hasOwnProperty(propName)) {
+  //         let propValue = files[propName];
+  //         console.log("key array", propValue);
+  //     }
+  // }
+
     if (files.length > 4) {
       return res.json(response.error("limit 4 image"))
     }
     let uploadImg = []
     for (let i = 0; i < files.length; i++) {
-      let nameImg = req.files.Mfile[i].name
+      let nameImg = req.files[''][i].name
+      console.log("image name ", nameImg);
       nameImg = nameImg.replace(/\s/g, '')
-      let path = `./assets/image/${nameImg}`
+      let path = `./public/image/${nameImg}`
       const newImge = new Image({ fileName: nameImg })
       console.log(path);
-      await req.files.Mfile[i].mv(path)
+      await req.files[''][i].mv(path)
       let data = await newImge.save()
       if (data) {
         await uploadImg.push(data)
@@ -64,7 +75,7 @@ const upload_multi_img = async function (req, res) {
       } else {
         throw err;
       }
-      if (i + 1 == req.files.Mfile.length) {
+      if (i + 1 == req.files[''].length) {
         res.json({ uploadImg })
       }
 
