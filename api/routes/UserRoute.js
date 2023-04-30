@@ -1,0 +1,16 @@
+module.exports = (app) => {
+    const userService = require('../services/UserService')
+    const verifyAuth = require('../middleWare/verifyAuth')
+    app.route('/register')
+        .post(userService.register)
+    app.route('/login')
+        .post(userService.login)
+    app.route('/usercms')
+        .post(userService.addUserCms)
+        .get(userService.getUser)
+        .put(userService.updateAuthUser)
+        .delete(userService.deleteUser)
+    app.route('/user/:id')
+        .get(userService.getUserDetail)
+        .put(userService.updateInforUser)
+}
