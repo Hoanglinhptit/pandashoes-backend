@@ -9,6 +9,7 @@ function ChangeName(length) {
     return result.join("");
 
 }
+
 module.exports = {
     ChangeName
 }

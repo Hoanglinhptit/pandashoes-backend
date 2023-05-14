@@ -5,5 +5,7 @@ module.exports = (app) => {
         .post(categoryServices.createCategory)
         .put(categoryServices.updatecategory)
         .delete(categoryServices.deleteCategory)
+    app.route('/category/:id')
+        .get(categoryServices.getCategoryDetail)
 
 }

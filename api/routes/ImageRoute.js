@@ -2,11 +2,13 @@
 module.exports = (app) => {
     const imageService = require('../services/ImageSevice')
     app.route('/image')
-        .post(imageService.upload_img)
-        .get(imageService.get_img)
-        .delete(imageService.delete_image)
+        .post(imageService.upload_img_aws)
+        .delete(imageService.delete_img_aws)
+        .get(imageService.get_img_media)
 
-    app.route('/multiImage')
-        .post(imageService.upload_multi_img)
+
+    app.route('/multi-image')
+        // .post(imageService.upload_multi_img)
+        .post(imageService.upload_multi_img_aws)
 
 }

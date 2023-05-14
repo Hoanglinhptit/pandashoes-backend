@@ -1,4 +1,5 @@
-const {Schema,model}= require('mongoose')
+const { Schema, model } = require('mongoose')
+const moment = require('moment')
 const Category = new Schema({
     name: {
         type: String,
@@ -6,9 +7,15 @@ const Category = new Schema({
     },
     isHot: {
         type: Boolean,
-        default:false
+
+        default: false
+    },
+    time: {
+        type: String,
+        default: moment(new Date()).format('DD/MM/YYYY')
     }
-},{
-    timestamps:true,
+}, {
+    timestamps: true,
 })
-module.exports = model('Category',Category)
+Category.index({ '$**': 'text' })
+module.exports = model('Category', Category)

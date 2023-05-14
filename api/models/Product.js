@@ -1,55 +1,68 @@
-const {Schema,model}= require('mongoose')
+const { Schema, model } = require('mongoose')
+const moment = require('moment')
 const Product = new Schema({
-    name : {
+    name: {
         type: String,
-        required:[true]
+        required: [true]
     },
-    sku:{
+    sku: {
         type: String,
-        required:[true]
+        required: [true]
     },
     price: {
-        type:Number,
+        type: Number,
         required: [true]
     },
-    isHot :{
-        type:Boolean,
-       default:false
+    isHot: {
+        type: Boolean,
+        default: false,
+        index: 1,
     },
-    size :[{
+    size: {
         type: Schema.Types.String,
-        
-    }],
+
+    },
     shortDescription: {
-        type:String,
-        required:[true]
-    },
-    description:{
-        type:String,
+        type: String,
         required: [true]
     },
-    category:[
-        {
-            type: Schema.Types.ObjectId,
-            ref:'Category'
-        }
-    ],
-    view :{
-        type:Number,
-        
-    },
-    image:[
-        {
-            type: Schema.Types.ObjectId,
-            ref:"Image"
-        }
-    ],
-    brand:{
-        type:String,
+    description: {
+        type: String,
         required: [true]
+    },
+    parentCategory : {
+        type: String,
+        required: [true]
+    },
+    category: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Category',
+            index: 1,
+        }
+    ],
+    views: {
+        type: Number,
+        default: 1
+
+    },
+    image: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Image"
+        }
+    ],
+    brand: {
+        type: String,
+        required: [true]
+    },
+    time: {
+        type: String,
+        default: moment(new Date()).format('DD/MM/YYYY')
     }
 },
-{
-    timestamps:true,
-})
-module.exports=model('Product',Product)
+    {
+        timestamps: true,
+    })
+Product.index({ '$**': 'text' })
+module.exports = model('Product', Product)
