@@ -15,6 +15,7 @@ function pagination(data, keySearch, limit, pageIndex, model, res) {
     model.countDocuments(keySearch || {}).exec(async (err, dataCount) => {
         if (err) return err
         totalRecord = dataCount
+
         let totalPage = countTotalPage(totalRecord, limit)
         // console.log("data res", data)
         res.json(response.success({
