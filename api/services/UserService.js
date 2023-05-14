@@ -18,14 +18,13 @@ const login = async (req, res) => {
 
     if (userChek && userChek !== null) {
         const deCode = await bcrypt.compare(passWord, userChek.passWord)
-        console.log("", deCode)
         if (deCode === true) {
 
             const token = generateAccessToken({
                 email: req.body.email,
-                passWord: req.body.passWord
+                 
             });
-            res.json(response.success({ token, user: userChek._id, name: userChek.firstName + userChek.lastName }))
+            res.json(response.success({ token, user: userChek._id, name: userChek.firstName +' '+ userChek.lastName  }))
 
         } else {
             res.json(response.error({ message: 'sai mat khau' }))
@@ -34,26 +33,6 @@ const login = async (req, res) => {
         res.json(response.error({ message: "User does not existed!" }))
     }
 }
-
-// const data = {
-//     fields: [
-//         {
-//             keyName: "date",
-//             type: 123,
-//             filterOptions: {
-//                 isFilter: true,
-//                 typeFilter: "date"
-//             }
-//         }
-//     ]
-// }
-
-// const body = {
-//     filterOption: {
-//         "email": "123213",
-//         "dsadlasdsa": "12321321"
-//     }
-// }
 
 const register = async (req, res) => {
     const { firstName, lastName, email, passWord, address, initSecret, phone } = req.body

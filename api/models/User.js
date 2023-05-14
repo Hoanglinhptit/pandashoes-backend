@@ -1,7 +1,5 @@
 
 const { Schema, model } = require('mongoose')
-//const mongoosastic = require('mongoosastic')
-// const moment = require('moment')
 const User = new Schema({
     firstName: {
         type: String,

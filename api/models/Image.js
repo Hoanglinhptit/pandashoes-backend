@@ -1,6 +1,10 @@
 const { Schema, model } = require('mongoose')
 const moment = require('moment')
 const Image = new Schema({
+    url :{
+        type: String,
+        required: [true]
+    },
     fileName: {
         type: String,
         required: [true]

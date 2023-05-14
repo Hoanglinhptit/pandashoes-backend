@@ -1,25 +1,39 @@
 const response = require("../common/response");
 const { model } = require("mongoose");
-const CartRoute = require("../routes/CartRoute");
 const ShoppingCart = model("ShoppingCart");
-const Image = model("Image");
 const Product = model("Product");
-const addCart = (req, res) => {
-  const { products, user } = req.body;
-  let arrId = products.map((item) => {
-    return item.id;
-  });
-  const dataCart = {
-    products: arrId,
-    cart: JSON.stringify(products),
-    user,
-  };
-  const newCart = new ShoppingCart(dataCart);
-  newCart.save((err, data) => {
-    if (err) return res.json(response.error(err));
-    res.json(response.success(data));
-  });
+
+const addCart = async (req, res, next) => {
+  try {
+    const { userId, productId, quantity } = req.body;
+    const cart = await ShoppingCart.findOne({ user: userId });
+    if (cart) {
+      // If the cart already exists, add the product to the items array or update its quantity
+      const productIndex = cart.items.findIndex(item => item.product.equals(productId));
+
+      if (productIndex !== -1) {
+        // If the product already exists in the cart, update its quantity
+        cart.items[productIndex].quantity += quantity;
+      } else {
+        // If the product doesn't exist in the cart, add it to the items array
+        cart.items.push({ product: productId, quantity });
+      }
+      await cart.save();
+      res.json(response.success(cart));}
+      else {
+        // If the cart doesn't exist, create a new one with the product
+        const newCart = await ShoppingCart.create({
+          user: userId,
+          items: [{ product: productId, quantity }],
+        });
+        res.json(response.success(newCart));
+      }
+  } catch (error) {
+    next(error)
+  }
+ 
 };
+
 const updateCart = (req, res) => {
   const { products, user } = req.body;
   let arrId = products.map((item) => {
@@ -39,6 +53,7 @@ const updateCart = (req, res) => {
     }
   );
 };
+
 const deleteProductInCart = (req, res) => {
   const { products, user } = req.body;
   ShoppingCart.findOne({ user }, { __v: 0 }, (err, data) => {
@@ -83,7 +98,6 @@ const findProductCart = (req, res) => {
         size: cart[i].size,
       });
       if (i === cart.length - 1) {
-        console.log("cart", cartRes);
         res.json(response.success(cartRes));
       }
     });

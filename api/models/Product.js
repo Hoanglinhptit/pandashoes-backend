@@ -17,8 +17,6 @@ const Product = new Schema({
         type: Boolean,
         default: false,
         index: 1,
-
-
     },
     size: {
         type: Schema.Types.String,
@@ -29,6 +27,10 @@ const Product = new Schema({
         required: [true]
     },
     description: {
+        type: String,
+        required: [true]
+    },
+    parentCategory : {
         type: String,
         required: [true]
     },

@@ -57,12 +57,9 @@ const getCategory = (req, res) => {
 const createCategory = async (req, res) => {
     const { limit, keySearch } = req.query
     const { name } = req.body
-    console.log("name", name);
 
-
-    // console.log(category);
     const exist = await Category.find({ name: { $regex: name, $options: 'i' } }, { __v: 0 })
-    // console.log(exist.length);
+
     if (exist.length >= 1) { return res.json(response.error({ message: "name exist" })) }
     const newCategory = new Category({ name: name })
     newCategory.save((err, data) => {

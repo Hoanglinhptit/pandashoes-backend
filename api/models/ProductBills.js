@@ -10,20 +10,18 @@ const ProductBills = new Schema({
         required: [true]
     },
     size: {
-        type: Number,
+        type: String,
         required: [true]
     },
     price: {
         type: Number,
         required: [true]
     },
-    // time: {
-    //     type: String,
-    //     default: moment(new Date()).format('DD/MM/YYYY')
-    // }
+    time: {
+        type: String,
+        default: moment(new Date()).format('DD/MM/YYYY')
+    }
 
-}, {
-    timestamps: true,
-})
+} )
 ProductBills.index({ '$**': 'text' })
 module.exports = model('ProductBills', ProductBills)
