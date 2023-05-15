@@ -1,4 +1,3 @@
-const res = require("express/lib/response")
 const response = require("../common/response")
 function getOffset(page, limit) {
     let pageIndex = parseInt(page) < 1 ? 1 : parseInt(page)
@@ -17,7 +16,6 @@ function pagination(data, keySearch, limit, pageIndex, model, res) {
         totalRecord = dataCount
 
         let totalPage = countTotalPage(totalRecord, limit)
-        // console.log("data res", data)
         res.json(response.success({
             limit: parseInt(limit) < 1 ? 1 : parseInt(limit),
             data,
