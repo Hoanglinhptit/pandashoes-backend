@@ -1,7 +1,7 @@
 const response = require("../common/response");
 const { model } = require("mongoose");
 const ShoppingCart = model("ShoppingCart");
-const Product = model("Product");
+const utilsPagination = require("../utils/pagination");
 
 const addCart = async (req, res, next) => {
   try {
@@ -72,18 +72,20 @@ const deleteOneProductCart = async (req, res, next) => {
     const cart = await ShoppingCart.findOne({ user: userId });
     if (cart) {
       // If the cart already exists, remove the product from the items array
-      const productIndex = cart.items.findIndex(item => item.product.equals(productId));
+      const productIndex = cart.items.findIndex((item) =>
+        item.product.equals(productId)
+      );
       if (productIndex !== -1) {
         cart.items.splice(productIndex, 1);
       } else {
         // If the product doesn't exist in the cart, throw an error
-        throw new Error('Product not found in cart');
+        throw new Error("Product not found in cart");
       }
       await cart.save();
       res.json(response.success(cart));
     } else {
       // If the cart doesn't exist, throw an error
-      throw new Error('Cart not found');
+      throw new Error("Cart not found");
     }
   } catch (error) {
     next(error);
@@ -92,12 +94,43 @@ const deleteOneProductCart = async (req, res, next) => {
 const getProductCart = async (req, res, next) => {
   try {
     const { userId } = req.body;
-    const cart = await ShoppingCart.findOne({ user: userId }).populate('items.product');
+    const { keySearch, limit, pageIndex } = req.query;
+    const query = { user: userId };
+    if (keySearch) {
+      query["items.product.name"] = { $regex: keySearch, $options: "i" };
+    }
+
+    const totalCount = await ShoppingCart.countDocuments(query);
+    const skip = utilsPagination.getOffset(pageIndex, limit);
+    const cart = await ShoppingCart.findOne({ user: userId }).populate({
+      path: "items.product",
+      populate: {
+        path: "image",
+        model: "Image",
+      },
+      options: {
+        skip: skip < totalCount ? skip : 0,
+        limit,
+      },
+    });
     if (cart) {
-      res.json(response.success(cart));
+      utilsPagination.pagination(
+        cart,
+        keySearch,
+        limit,
+        pageIndex,
+        ShoppingCart,
+        res
+      );
     } else {
       // If the cart doesn't exist, return an empty cart
-      res.json(response.success({ items: [], user: userId, time: moment(new Date()).format("DD/MM/YYYY") }));
+      res.json(
+        response.success({
+          items: [],
+          user: userId,
+          time: moment(new Date()).format("DD/MM/YYYY"),
+        })
+      );
     }
   } catch (error) {
     next(error);
@@ -186,5 +219,5 @@ module.exports = {
   // deleteProductInCart,
   // findProductCart,
   deleteOneProductCart,
-  getProductCart
+  getProductCart,
 };
