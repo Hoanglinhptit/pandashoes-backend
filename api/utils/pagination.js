@@ -1,4 +1,3 @@
-const res = require("express/lib/response")
 const response = require("../common/response")
 function getOffset(page, limit) {
     let pageIndex = parseInt(page) < 1 ? 1 : parseInt(page)
