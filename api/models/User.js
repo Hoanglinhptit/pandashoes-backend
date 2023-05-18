@@ -34,7 +34,7 @@ const User = new Schema({
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
-    },
+    }, 
     historyShopping: [
         {
             type: Schema.Types.ObjectId,

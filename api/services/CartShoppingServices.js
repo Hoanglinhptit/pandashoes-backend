@@ -99,8 +99,6 @@ const getProductCart = async (req, res, next) => {
     if (keySearch) {
       query["items.product.name"] = { $regex: keySearch, $options: "i" };
     }
-
-    const totalCount = await ShoppingCart.countDocuments(query);
     const skip = utilsPagination.getOffset(pageIndex, limit);
     const cart = await ShoppingCart.findOne({ user: userId }).populate({
       path: "items.product",
@@ -109,13 +107,19 @@ const getProductCart = async (req, res, next) => {
         model: "Image",
       },
       options: {
-        skip: skip < totalCount ? skip : 0,
+        skip: skip,
         limit,
       },
     });
     if (cart) {
+      const filteredItems = cart.items.filter((item) =>
+        item.product.name.toLowerCase().includes(keySearch.toLowerCase())
+      );
       utilsPagination.pagination(
-        cart,
+        {
+          ...cart.toObject(),
+          items: filteredItems,
+        },
         keySearch,
         limit,
         pageIndex,
@@ -155,15 +159,17 @@ const getProductCart = async (req, res, next) => {
 //     res.json(response.success("đã xóa"));
 //   });
 // };
-// const deleteAllProductCart = (req, res) => {
-//   const { user } = req.body;
-//   ShoppingCart.findOne({ user }).exec(async (err, data) => {
-//     if (err) return res.json(response.error(err));
-//     await data.products.splice(0, data.products.length - 1);
-//     data.cart.replace(data.cart, "");
-//     res.json(response.success("da xoa tat ca"));
-//   });
-// };
+const deleteAllProductCart = (req, res) => {
+  const { user } = req.body;
+  ShoppingCart.findOne({ user }).exec(async (err, data) => {
+    if (err) return res.json(response.error(err));
+    console.log(data.items);
+    await data.items.splice(0, data.items.length - 1);
+
+    // data.cart.replace(data.cart, "");
+    res.json(response.success("da xoa tat ca"));
+  });
+};
 
 // const findProductCart = (req, res) => {
 //   const { cart } = req.body;
@@ -215,7 +221,7 @@ module.exports = {
   // getCart,
   addCart,
   updateCart,
-  // deleteAllProductCart,
+  deleteAllProductCart,
   // deleteProductInCart,
   // findProductCart,
   deleteOneProductCart,
