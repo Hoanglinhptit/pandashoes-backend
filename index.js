@@ -3,9 +3,11 @@ const app = express();
 const path = require("path");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const http = require('http');
 const io = require("socket.io");
 const AWS = require("aws-sdk");
 const bodyParser = require("body-parser");
+const { handleConnection }  = require('./api/services/ChatServices');
 mongoose.Promise = global.Promise;
 
 const routes = require("./api/routes");
@@ -17,19 +19,23 @@ AWS.config.update({
   secretAccessKey: "zUMH2PbOGocjsV0LT5i/3/BL/SNDMVMbchUMt08M",
 });
 
+
+
 app.use(express.static(path.join(__dirname, "public/image")));
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tpm/" }));
-
+const server = http.createServer(app);
+const socket = io(server)
+socket.on('connection', handleConnection);
 routes(app);
 mongoose.set('strictQuery', false);
 mongoose
   .connect("mongodb://localhost:27017/panda-shoes", { useNewUrlParser: true })
   .then(() => {
     console.log("Connected db");
-    app.listen(3001, () => {
+    server.listen(3001, () => {
       console.log("Connected on Port:", 3001);
     });
   })
