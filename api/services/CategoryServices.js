@@ -7,8 +7,6 @@ const response = require('../common/response'),
 
 const getCategory = (req, res) => {
     const { pageIndex, limit, keySearch } = req.query
-    console.log(req.query);
-
     //have keySearch
 
     if (keySearch !== "") {
@@ -36,7 +34,6 @@ const getCategory = (req, res) => {
     }
     // not keySearch
     else if (keySearch === "") {
-        console.log("req ne", req.query);
         if (pageIndex !== "undefined") {
             Category.find({}).skip(utilsPagination.getOffset(pageIndex, limit)).limit(parseInt(limit)).exec((err, data) => {
                 if (err) return res.json(response.error(err))

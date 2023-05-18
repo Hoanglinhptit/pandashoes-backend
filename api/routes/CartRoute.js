@@ -6,6 +6,8 @@ module.exports = (app) => {
     .post(cartServices.addCart)
     .put(cartServices.updateCart)
     .delete(cartServices.deleteOneProductCart)
-
+  app
+    .route('/carts')
+    .delete(cartServices.deleteAllProductCart)
 //   app.route("/productCart").post(cartServices.findProductCart);s
 };
