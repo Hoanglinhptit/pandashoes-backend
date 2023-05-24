@@ -42,8 +42,8 @@ mongoose
   .connect("mongodb://localhost:27017/panda-shoes", { useNewUrlParser: true })
   .then(() => {
     console.log("Connected db");
-    server.listen(3001, () => {
-      console.log("Connected on Port:", 3001);
+    server.listen(80, () => {
+      console.log("Connected on Port:", 80);
     });
   })
   .catch((err) => console.log("err: ", err));
