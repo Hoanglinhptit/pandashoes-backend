@@ -1,5 +1,6 @@
 const response = require("../common/response");
 const { model } = require("mongoose");
+const moment = require("moment");
 const ShoppingCart = model("ShoppingCart");
 const utilsPagination = require("../utils/pagination");
 
@@ -111,10 +112,12 @@ const getProductCart = async (req, res, next) => {
         limit,
       },
     });
+    console.log("cart ", cart);
     if (cart) {
-      const filteredItems = cart.items.filter((item) =>
-        item.product.name.toLowerCase().includes(keySearch.toLowerCase())
-      );
+      const filteredItems = cart.items.filter((item) => {
+       
+          return item.product.name.toLowerCase().includes(keySearch.toLowerCase());
+      });
       utilsPagination.pagination(
         {
           ...cart.toObject(),
