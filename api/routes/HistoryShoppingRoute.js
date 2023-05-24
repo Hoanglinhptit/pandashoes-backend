@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    const historyShoppingServices = require('../services/historyShoppingServices')
+    const historyShoppingServices = require('../services/HistoryShoppingServices')
     app.route('/historyShopping')
         .get(historyShoppingServices.getType)
         .post(historyShoppingServices.addBill)
