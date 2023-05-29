@@ -36,10 +36,10 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tpm/" }));
 routes(app);
-
+// mongodb://localhost:27017/panda-shoes
 mongoose.set("strictQuery", false);
 mongoose
-  .connect("mongodb://localhost:27017/panda-shoes", { useNewUrlParser: true })
+  .connect("mongodb+srv://linhle:mai2022@soyuli.d6ybjr3.mongodb.net/?authSource=soyuli&authMechanism=SCRAM-SHA-1", { useNewUrlParser: true })
   .then(() => {
     console.log("Connected db");
     server.listen(80, () => {
