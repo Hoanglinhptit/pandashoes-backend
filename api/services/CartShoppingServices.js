@@ -112,7 +112,6 @@ const getProductCart = async (req, res, next) => {
         limit,
       },
     });
-    console.log("cart ", cart);
     if (cart) {
       const filteredItems = cart.items.filter((item) => {
        
