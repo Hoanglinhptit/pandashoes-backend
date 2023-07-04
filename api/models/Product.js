@@ -32,7 +32,7 @@ const Product = new Schema({
     },
     parentCategory : {
         type: String,
-        required: [true]
+        // required: [true]
     },
     category: [
         {
