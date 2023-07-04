@@ -57,8 +57,8 @@ async function startServer() {
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tpm/" }));
     routes(app);
-    server.listen(3000, () => {
-      console.log("Connected on Port:", 3000);
+    server.listen(8000, () => {
+      console.log("Connected on Port:", 8000);
     });
     resolve(server);
   });
