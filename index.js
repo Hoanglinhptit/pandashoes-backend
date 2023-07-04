@@ -39,6 +39,7 @@ async function startDB() {
 async function startServer() {
   return new Promise((resolve, reject) => {
     const app = express();
+    app.use(cors());
     AWS.config.update({
       accessKeyId: "AKIAQR5LWODMYC2RUX5D",
       secretAccessKey: "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",
@@ -51,13 +52,13 @@ async function startServer() {
     const socket = io(server);
     socket.on("connection", handleConnection);
     app.use(express.static(path.join(__dirname, "public/image")));
-    app.use(cors());
+    
     app.use(express.json());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tpm/" }));
     routes(app);
-    server.listen(80, () => {
-      console.log("Connected on Port:", 80);
+    server.listen(8080, () => {
+      console.log("Connected on Port:", 8080);
     });
     resolve(server);
   });
