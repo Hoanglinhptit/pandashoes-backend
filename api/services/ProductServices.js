@@ -17,6 +17,7 @@ const createProduct = async (req, res) => {
     shortDescription,
     description,
     category,
+    parentCategory,
     brand,
     image,
   } = req.body;
@@ -36,6 +37,7 @@ const createProduct = async (req, res) => {
     category,
     brand,
     image,
+    parentCategory,
   };
   const newData = new Product(ProductData);
   newData.save((err, data) => {
