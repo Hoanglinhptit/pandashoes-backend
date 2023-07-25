@@ -75,5 +75,6 @@ const startApp = async function (callback) {
 };
 
 startApp(()=>{
+  console.log(Date());
   console.log("Connect to server success");
 })

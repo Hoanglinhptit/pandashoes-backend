@@ -112,10 +112,24 @@ const getProductByBrand = async (req, res) => {
 };
 //get all and get search for admin
 const getAllProduct = async (req, res) => {
-  let { pageIndex, limit, keySearch } = req.query;
+  let { pageIndex, limit, keySearch, parentCategory, brand } = req.query;
+  const filter = {};
+
+  if (keySearch) {
+    filter.name = { $regex: keySearch, $options: "i" };
+  }
+
+  if (parentCategory) {
+    filter.parentCategory = parentCategory;
+  }
+
+  if (brand) {
+    filter.brand = brand;
+  }
   if (keySearch !== "") {
     const products = await Product.find(
-      { $or: [{ name: { $regex: keySearch, $options: "i" } }] },
+      // { $or: [{ name: { $regex: keySearch, $options: "i" } }] },
+      filter,
       { __v: 0 }
     )
       .skip(utilsPagination.getOffset(pageIndex, limit))
