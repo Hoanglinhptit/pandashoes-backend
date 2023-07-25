@@ -71,7 +71,7 @@ const upload_multi_img_aws = async (req, res, next) => {
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).send("No files were uploaded.");
     }
-    const files = await req.files[""];
+    const files = await req.files.files;
     if (files.length > 10) {
       return res.json(response.error("limit 10 images"));
     }
