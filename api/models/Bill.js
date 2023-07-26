@@ -5,27 +5,12 @@ const Bill = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    // productBill: [
-    //     {
-    //         type: Schema.Types.ObjectId,
-    //         ref: 'ProductBill'
-    //     }
-    // ],
-    products: {
-        type: String,
-        required: true,
-        index: true
-    },
-    payment: {
-        type: Number,
-        required: [true]
-    },
-    status: {
-        type: String,
-        enum: ["processing", "received", "shipping", 'completed'],
-        default: 'processing',
-
-    },
+    productBill: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'ProductBill'
+        }
+    ],
     time: {
         type: String,
         default: moment(new Date()).format('DD/MM/YYYY')

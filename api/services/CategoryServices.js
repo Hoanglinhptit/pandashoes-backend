@@ -7,8 +7,6 @@ const response = require('../common/response'),
 
 const getCategory = (req, res) => {
     const { pageIndex, limit, keySearch } = req.query
-    console.log(req.query);
-
     //have keySearch
 
     if (keySearch !== "") {
@@ -26,6 +24,7 @@ const getCategory = (req, res) => {
             //search paginate
 
             Category.find({ name: { $regex: keySearch, $options: 'i' } }).skip(utilsPagination.getOffset(pageIndex, limit)).limit(parseInt(limit)).exec((err, data) => {
+
                 if (err) return res.json(response.error(err))
                 console.log("hoolo", data);
                 utilsPagination.pagination(data, keySearch, limit, pageIndex, Category, res, { name: { $regex: keySearch, $options: 'i' } })
@@ -35,7 +34,6 @@ const getCategory = (req, res) => {
     }
     // not keySearch
     else if (keySearch === "") {
-        console.log("req ne", req.query);
         if (pageIndex !== "undefined") {
             Category.find({}).skip(utilsPagination.getOffset(pageIndex, limit)).limit(parseInt(limit)).exec((err, data) => {
                 if (err) return res.json(response.error(err))
@@ -57,12 +55,9 @@ const getCategory = (req, res) => {
 const createCategory = async (req, res) => {
     const { limit, keySearch } = req.query
     const { name } = req.body
-    console.log("name", name);
 
-
-    // console.log(category);
     const exist = await Category.find({ name: { $regex: name, $options: 'i' } }, { __v: 0 })
-    // console.log(exist.length);
+
     if (exist.length >= 1) { return res.json(response.error({ message: "name exist" })) }
     const newCategory = new Category({ name: name })
     newCategory.save((err, data) => {
@@ -114,6 +109,7 @@ const deleteCategory = async (req, res) => {
     Category.findByIdAndDelete({ _id: id }).exec(async (err, data) => {
         if (err) return res.json(response.error(err))
         const log = await Product.find({ category: id })
+        console.log("log",log)
         for (let i = 0; i < log.length; i++) {
             let arrCategory = log[i].category
             const check = arrCategory.indexOf(data._id)
@@ -123,6 +119,7 @@ const deleteCategory = async (req, res) => {
             await log[i].save()
         }
         res.json(response.success({ message: `deleted category ${data.name}` }))
+        console.log(`deleted category ${data.name}`)
     })
 
 }

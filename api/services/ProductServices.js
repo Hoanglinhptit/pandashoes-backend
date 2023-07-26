@@ -17,6 +17,7 @@ const createProduct = async (req, res) => {
     shortDescription,
     description,
     category,
+    parentCategory,
     brand,
     image,
   } = req.body;
@@ -36,6 +37,7 @@ const createProduct = async (req, res) => {
     category,
     brand,
     image,
+    parentCategory,
   };
   const newData = new Product(ProductData);
   newData.save((err, data) => {
@@ -45,7 +47,6 @@ const createProduct = async (req, res) => {
         $or: [{ name: { $regex: keySearch, $options: "i" } }],
       });
     } else if (!keySearch || keySearch === "") {
-
       utilsPagination.pagination(data, keySearch, limit, null, Product, res);
     }
   });
@@ -80,7 +81,6 @@ const updateProduct = (req, res) => {
     }),
     isHot,
   };
-  console.log("data", dataNew);
   Product.findByIdAndUpdate(
     { _id: id },
     {
@@ -114,12 +114,24 @@ const getProductByBrand = async (req, res) => {
 };
 //get all and get search for admin
 const getAllProduct = async (req, res) => {
-  let { pageIndex, limit, keySearch } = req.query;
-  console.log(pageIndex, limit, keySearch);
+  let { pageIndex, limit, keySearch, parentCategory, brand } = req.query;
+  const filter = {};
 
+  if (keySearch) {
+    filter.name = { $regex: keySearch, $options: "i" };
+  }
+
+  if (parentCategory) {
+    filter.parentCategory = parentCategory;
+  }
+
+  if (brand) {
+    filter.brand = brand;
+  }
   if (keySearch !== "") {
     const products = await Product.find(
-      { $or: [{ name: { $regex: keySearch, $options: "i" } }] },
+      // { $or: [{ name: { $regex: keySearch, $options: "i" } }] },
+      filter,
       { __v: 0 }
     )
       .skip(utilsPagination.getOffset(pageIndex, limit))
@@ -156,10 +168,9 @@ const getAllProduct = async (req, res) => {
     utilsPagination.pagination(products, "", limit, pageIndex, Product, res);
   }
 };
-const getHome = (req, res) => {
+const getHome = async (req, res) => {
   let { pageIndex, limit } = req.query;
-
-  Product.find({})
+  await Product.find({})
     .populate("category", "_id name")
     .skip(utilsPagination.getOffset(pageIndex, limit))
     .limit(parseInt(limit))
@@ -178,19 +189,24 @@ const getHome = (req, res) => {
 
 const getDetailProduct = async (req, res) => {
   const { id } = req.params;
-  Product.findById({ _id: id }, { __v: 0 }, { new: true }, (error, data) => {
-    if (error) return res.json(response.error(error));
-    Product.updateOne(
-      { _id: id },
-      { views: data.views + 1 },
-      { new: true },
-      (err, data1) => {
-        if (err) return res.json(response.error(err));
-        console.log(data1);
-        utilsPagination.pagination(data, null, null, null, Product, res);
-      }
-    );
-  }).populate([
+  await Product.findById(
+    { _id: id },
+    { __v: 0 },
+    { new: true },
+    (error, data) => {
+      if (error) return res.json(response.error(error));
+      Product.updateOne(
+        { _id: id },
+        { views: data.views + 1 },
+        { new: true },
+        (err, data1) => {
+          if (err) return res.json(response.error(err));
+          console.log(data1);
+          utilsPagination.pagination(data, null, null, null, Product, res);
+        }
+      );
+    }
+  ).populate([
     { path: "image", select: " _id isPriority fileName", model: Image },
     { path: "category", select: "_id name isHot", model: Category },
   ]); //2 cachs 1 laf dung " image category" 2 la dung mang [{path:'image',select:'select 1',model:'Image'},{path:'category',select:'select 1',model:'category'}]

@@ -1,29 +1,42 @@
-const { Schema, model } = require('mongoose')
-const moment = require('moment')
+const { Schema, model } = require("mongoose");
+const moment = require("moment");
 const ProductBills = new Schema({
-    product: {
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
+  items: [
+    {
+      product: {
         type: Schema.Types.ObjectId,
-        ref: 'Product'
-    },
-    quantity: {
+        ref: "Product",
+        required: true,
+      },
+      quantity: {
         type: Number,
-        required: [true]
+        required: true,
+        default: 1,
+      },
     },
-    size: {
-        type: Number,
-        required: [true]
-    },
-    price: {
-        type: Number,
-        required: [true]
-    },
-    // time: {
-    //     type: String,
-    //     default: moment(new Date()).format('DD/MM/YYYY')
-    // }
+  ],
+  price: {
+    type: Number,
+    required: [true],
+  },
+  shipInfo: {
+    type: String,
+    required: [true],
+  },
+  status: {
+    type: String,
+    enum: ["processing", "received", "shipping", "completed"],
+    default: "processing",
+  },
 
-}, {
-    timestamps: true,
-})
-ProductBills.index({ '$**': 'text' })
-module.exports = model('ProductBills', ProductBills)
+  time: {
+    type: String,
+    default: moment(new Date()).format("DD/MM/YYYY"),
+  },
+});
+ProductBills.index({ "$**": "text" });
+module.exports = model("ProductBills", ProductBills);

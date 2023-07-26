@@ -6,6 +6,7 @@ module.exports = (app) => {
     const newsRoute = require('./NewsRoute')
     const cartRoute = require('./CartRoute')
     const historyShopping = require('./HistoryShoppingRoute')
+    const ChatRoute = require('./ChatRoute')
     productRoute(app)
     userRoute(app)
     imageRoute(app)
@@ -13,5 +14,6 @@ module.exports = (app) => {
     newsRoute(app)
     cartRoute(app)
     historyShopping(app)
+    ChatRoute(app)
 
 }
