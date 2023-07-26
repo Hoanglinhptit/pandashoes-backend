@@ -14,6 +14,7 @@ const { handleConnection } = require("./api/services/ChatServices");
 require("./api/models");
 const routes = require("./api/routes");
 // require("dotenv").config();
+// first commit 
 mongoose.Promise = global.Promise;
 process.env.UV_THREAD_POOL_SIZE = os.cpus().length;
 
@@ -74,5 +75,6 @@ const startApp = async function (callback) {
 };
 
 startApp(()=>{
+  console.log(Date());
   console.log("Connect to server success");
 })
