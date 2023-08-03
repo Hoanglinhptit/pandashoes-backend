@@ -1,5 +1,5 @@
 const response = require("../common/response"),
-  { model } = require("mongoose"),
+  { model, Types } = require("mongoose"),
   Product = model("Product"),
   Image = model("Image"),
   Category = model("Category"),
@@ -114,30 +114,31 @@ const getProductByBrand = async (req, res) => {
 };
 //get all and get search for admin
 const getAllProduct = async (req, res) => {
-  let { pageIndex, limit, keySearch, parentCategory, brand } = req.query;
+  let { pageIndex, limit, keySearch, parentCategory, brand, category } =
+    req.query;
   const filter = {};
-
-  if (keySearch) {
-    filter.name = { $regex: keySearch, $options: "i" };
-  }
-
+  // if (keySearch) {
+  //   filter.name = { $regex: keySearch, $options: "i" };
+  // }
   if (parentCategory) {
     filter.parentCategory = parentCategory;
   }
-
   if (brand) {
     filter.brand = brand;
   }
+  // if (category) {
+  //   filter['category'] = brand;
+  // }
   if (keySearch !== "") {
-    const products = await Product.find(
-      // { $or: [{ name: { $regex: keySearch, $options: "i" } }] },
-      filter,
-      { __v: 0 }
-    )
+    filter.name = { $regex: keySearch, $options: "i" };
+
+    const products = await Product.find(filter, { __v: 0 })
+      .where("category")
+      .in(category)
       .skip(utilsPagination.getOffset(pageIndex, limit))
       .limit(parseInt(limit))
       .populate([
-        { path: "image", select: " _id isPriority fileName", model: Image },
+        { path: "image", select: " _id isPriority url fileName", model: Image },
         { path: "category", select: "_id name isHot", model: Category },
       ]);
     if (!products || products === null || products.length === 0) {
@@ -153,11 +154,11 @@ const getAllProduct = async (req, res) => {
       { $or: [{ name: { $regex: keySearch, $options: "i" } }] }
     );
   } else {
-    const products = await Product.find({}, { __v: 0 })
+    const products = await Product.find(filter, { __v: 0 })
       .skip(utilsPagination.getOffset(pageIndex, limit))
       .limit(parseInt(limit))
       .populate([
-        { path: "image", select: " _id isPriority fileName", model: Image },
+        { path: "image", select: " _id isPriority url fileName", model: Image },
         { path: "category", select: "_id name isHot", model: Category },
       ]);
     if (!products || products === null || products.length === 0) {
@@ -189,27 +190,34 @@ const getHome = async (req, res) => {
 
 const getDetailProduct = async (req, res) => {
   const { id } = req.params;
-  await Product.findById(
-    { _id: id },
-    { __v: 0 },
-    { new: true },
-    (error, data) => {
-      if (error) return res.json(response.error(error));
-      Product.updateOne(
-        { _id: id },
-        { views: data.views + 1 },
-        { new: true },
-        (err, data1) => {
-          if (err) return res.json(response.error(err));
-          console.log(data1);
-          utilsPagination.pagination(data, null, null, null, Product, res);
-        }
-      );
+  console.log("id type", typeof id);
+  const objectID = Types.ObjectId(id);
+  console.log("objectID??", objectID);
+
+  try {
+    // Use await to get the result directly
+    const data = await Product.findOne({ _id: objectID }, { __v: 0 }).populate([
+      { path: "image", select: "_id isPriority url fileName", model: Image },
+      { path: "category", select: "_id name isHot", model: Category },
+    ]);
+    // If data is null, the document with the provided id was not found
+    if (!data) {
+      return res.json(response.error("Product not found"));
     }
-  ).populate([
-    { path: "image", select: " _id isPriority fileName", model: Image },
-    { path: "category", select: "_id name isHot", model: Category },
-  ]); //2 cachs 1 laf dung " image category" 2 la dung mang [{path:'image',select:'select 1',model:'Image'},{path:'category',select:'select 1',model:'category'}]
+
+    // Update the views count
+    const updatedProduct = await Product.updateOne(
+      { _id: objectID },
+      { $inc: { views: 1 } }
+    );
+
+    console.log(updatedProduct);
+
+    // Do something with the data and send the response
+    utilsPagination.pagination(data, null, null, null, Product, res);
+  } catch (error) {
+    return res.json(response.error(error));
+  }
 };
 const getRelateProduct = (req, res) => {
   const { id, pageIndex, limit } = req.query;
@@ -268,13 +276,14 @@ const getTypeQuery = (req, res) => {
     case "home":
       getHome(req, res);
       break;
-    case "product":
-      if (brand === "" || brand === null) {
-        getAllProduct(req, res);
-      } else {
-        getProductByBrand(req, res);
-      }
-      break;
+    // case "product":
+    //   // if (brand === "" || brand === null) {
+    //   //   getAllProduct(req, res);
+    //   // } else {
+    //   //   getProductByBrand(req, res);
+    //   // }
+    //   getAllProduct(req, res);
+    //   break;
     default:
       getAllProduct(req, res);
       break;

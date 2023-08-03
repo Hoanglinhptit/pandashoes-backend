@@ -6,7 +6,7 @@ const utilsPagination = require("../utils/pagination");
 
 const addCart = async (req, res, next) => {
   try {
-    const { userId, productId, quantity } = req.body;
+    const { userId, productId, quantity, type } = req.body;
     const cart = await ShoppingCart.findOne({ user: userId });
     if (cart) {
       // If the cart already exists, add the product to the items array or update its quantity
@@ -19,7 +19,7 @@ const addCart = async (req, res, next) => {
         cart.items[productIndex].quantity += quantity;
       } else {
         // If the product doesn't exist in the cart, add it to the items array
-        cart.items.push({ product: productId, quantity });
+        cart.items.push({ product: productId, quantity, type });
       }
       await cart.save();
       res.json(response.success(cart));
@@ -27,7 +27,7 @@ const addCart = async (req, res, next) => {
       // If the cart doesn't exist, create a new one with the product
       const newCart = await ShoppingCart.create({
         user: userId,
-        items: [{ product: productId, quantity }],
+        items: [{ product: productId, quantity, type }],
       });
       res.json(response.success(newCart));
     }
@@ -37,7 +37,7 @@ const addCart = async (req, res, next) => {
 };
 const updateCart = async (req, res, next) => {
   try {
-    const { userId, productId, quantity } = req.body;
+    const { userId, productId, quantity, type } = req.body;
     const cart = await ShoppingCart.findOne({ user: userId });
     if (cart) {
       // If the cart already exists, update the product quantity or remove it if quantity is 0
@@ -52,6 +52,9 @@ const updateCart = async (req, res, next) => {
         } else {
           // Update the quantity of the product
           cart.items[productIndex].quantity = quantity;
+        }
+        if (type !== "") {
+          cart.items[productIndex].type = type;
         }
       } else {
         // If the product doesn't exist in the cart, throw an error
@@ -114,8 +117,9 @@ const getProductCart = async (req, res, next) => {
     });
     if (cart) {
       const filteredItems = cart.items.filter((item) => {
-       
-          return item.product.name.toLowerCase().includes(keySearch.toLowerCase());
+        return item.product.name
+          .toLowerCase()
+          .includes(keySearch.toLowerCase());
       });
       utilsPagination.pagination(
         {

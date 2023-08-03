@@ -5,6 +5,7 @@ const resJson = require("../utils/pagination");
 const makeName = require("../utils/ChangeName");
 const { v4: uuidv4 } = require("uuid");
 const AWS = require("aws-sdk");
+const { log } = require("console");
 
 Image = model("Image");
 const domain = "http://localhost:3001/";
@@ -22,9 +23,13 @@ const upload_img_aws = async (req, res, next) => {
     let image = {};
     const file = await req.files.file;
     const fileData = await fs.readFileSync(file.tempFilePath);
+    // Normalize the file name and remove any invalid characters
+    const normalizedFileName = file.name
+      .normalize("NFC")
+      .replace(/[^a-zA-Z0-9_.\u00C0-\u017F]/g, "_");
     const params = {
       Bucket: "soyuli-order-photos",
-      Key: `${uuidv4()}_${file.name}`,
+      Key: `${uuidv4()}_${normalizedFileName}`,
       Body: fileData,
       ContentType: file.mimetype,
     };
@@ -71,10 +76,11 @@ const upload_multi_img_aws = async (req, res, next) => {
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).send("No files were uploaded.");
     }
-    const files = await req.files.files;
+    const files = await req.files[""];
     if (files.length > 10) {
       return res.json(response.error("limit 10 images"));
     }
+    console.log("files ???", req.files);
     const images = [];
     const promises = files.map(async (file) => {
       const fileData = fs.readFileSync(file.tempFilePath);

@@ -2,10 +2,11 @@ const { Schema, model } = require("mongoose");
 const moment = require("moment");
 const ShoppingCart = new Schema(
   {
-    items: [{
+    items: [
+      {
         product: {
           type: Schema.Types.ObjectId,
-          ref: 'Product',
+          ref: "Product",
           required: true,
         },
         quantity: {
@@ -13,7 +14,11 @@ const ShoppingCart = new Schema(
           required: true,
           default: 1,
         },
-      }],
+        type: {
+          type: String,
+        },
+      },
+    ],
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
