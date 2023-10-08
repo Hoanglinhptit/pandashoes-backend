@@ -80,7 +80,6 @@ const upload_multi_img_aws = async (req, res, next) => {
     if (files.length > 10) {
       return res.json(response.error("limit 10 images"));
     }
-    console.log("files ???", req.files);
     const images = [];
     const promises = files.map(async (file) => {
       const fileData = fs.readFileSync(file.tempFilePath);

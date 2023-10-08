@@ -34,7 +34,6 @@ const getCategory = (req, res) => {
         .limit(parseInt(limit))
         .exec((err, data) => {
           if (err) return res.json(response.error(err));
-          console.log("hoolo", data);
           utilsPagination.pagination(
             data,
             keySearch,

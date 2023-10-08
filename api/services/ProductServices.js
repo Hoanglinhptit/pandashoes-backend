@@ -116,6 +116,7 @@ const getProductByBrand = async (req, res) => {
 const getAllProduct = async (req, res) => {
   let { pageIndex, limit, keySearch, parentCategory, brand, category } =
     req.query;
+  console.log("category ??", category);
   const filter = {};
   // if (keySearch) {
   //   filter.name = { $regex: keySearch, $options: "i" };
@@ -126,12 +127,13 @@ const getAllProduct = async (req, res) => {
   if (brand) {
     filter.brand = brand;
   }
+  if (keySearch) {
+    filter.name = { $regex: keySearch, $options: "i" };
+  }
   // if (category) {
   //   filter['category'] = brand;
   // }
-  if (keySearch !== "") {
-    filter.name = { $regex: keySearch, $options: "i" };
-
+  if (category) {
     const products = await Product.find(filter, { __v: 0 })
       .where("category")
       .in(category)
@@ -166,7 +168,17 @@ const getAllProduct = async (req, res) => {
         response.error({ message: "not found products thoa man" })
       );
     }
-    utilsPagination.pagination(products, "", limit, pageIndex, Product, res);
+    utilsPagination.pagination(
+      products,
+      keySearch,
+      limit,
+      pageIndex,
+      Product,
+      res,
+      {
+        $or: [{ name: { $regex: keySearch, $options: "i" } }],
+      }
+    );
   }
 };
 const getHome = async (req, res) => {
@@ -190,9 +202,7 @@ const getHome = async (req, res) => {
 
 const getDetailProduct = async (req, res) => {
   const { id } = req.params;
-  console.log("id type", typeof id);
   const objectID = Types.ObjectId(id);
-  console.log("objectID??", objectID);
 
   try {
     // Use await to get the result directly
